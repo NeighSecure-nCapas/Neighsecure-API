@@ -30,4 +30,7 @@ public interface HomeService {
     // TODO: validar si es necesaria la funcionalidad de actualizar el admin
     public void updateHomeAdmin(String homeName, String homeAddress, String homeAdmins);
 
+    // obtener el numero de hogares registrados
+    public Integer getHomesNumber();
+
 }

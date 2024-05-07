@@ -20,5 +20,13 @@ public interface UserService {
 
     // END OF CRUD IMPLEMENTATION
 
+    // ADDITIONAL METHODS
+    public void addRoleToUser(String userId, String roleId);
+    public void removeRoleFromUser(String userId, String roleId);
+    public List<User> getUsersByRole(String roleId);
+
+    // obtener el numero de usuarios por rol
+    public Integer getUsersNumberByRole(String date, String roleId);
+
 
 }
