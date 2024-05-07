@@ -12,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Permission {
+    // TODO: agregar anotaciones de JPA y cambiar nombres de atributos segun diccionario de datos
     private String id;
     private String type;
     private Date startDate;

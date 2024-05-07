@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class Entry {
+@NoArgsConstructor
+public class Key {
     // TODO: agregar anotaciones de JPA y cambiar nombres de atributos segun diccionario de datos
-    private String id;
-    private Date entryDate;
-    private String terminalId;
-    private String permissionId;
-    private String comment;
+    private String keyId;
+    // TODO: validar formatos de fecha y horas
+    private Date generationDate;
+    private Date generationTime;
+    private String generationDay;
 }

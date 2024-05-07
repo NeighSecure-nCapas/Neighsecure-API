@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class User {
+    // TODO: agregar anotaciones de JPA y cambiar nombres de atributos segun diccionario de datos
     private String id;
     private String name;
     private String email;
