@@ -4,16 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class Entry {
+@NoArgsConstructor
+public class Terminal {
     // TODO: agregar anotaciones de JPA y cambiar nombres de atributos segun diccionario de datos
-    private String id;
-    private Date entryDate;
     private String terminalId;
-    private String permissionId;
-    private String comment;
+    private String entryType; // podria ser un enum (? peatonal o vehicular
 }
