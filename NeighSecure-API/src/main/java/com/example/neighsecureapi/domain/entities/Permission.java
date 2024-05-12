@@ -49,8 +49,8 @@ public class Permission {
     private Date generationDate;
 
     // TODO: validar como hacer que reciba varios dias
-    //@Column(name = "dias")
-    //private List<String> days;
+    @Column(name = "dias")
+    private String days; // metodo del servicio para que reciba varios dias
 
     @JoinColumn(name = "casaId") // TODO: LLAVE FORANEA
     @ManyToOne

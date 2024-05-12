@@ -33,4 +33,17 @@ public interface PermissionService {
     // Validar vigencia de permisos
     public boolean validatePermission(String permissionId, String userId);
 
+
+    /*
+    metodos para setear bien los datos del atributo days en Permission, para manejarlo
+    * // Método para convertir la cadena de días a una lista de cadenas
+    public List<String> getDaysList() {
+        return Arrays.asList(this.days.split(","));
+    }
+
+    // Método para convertir la lista de días a una cadena separada por comas
+    public void setDaysList(List<String> daysList) {
+        this.days = String.join(",", daysList);
+    }
+    * */
 }
