@@ -23,12 +23,14 @@ public class Entry {
     @Column(name = "fechaYHora")
     private Date entryDate;
 
-    // TODO: agregar llaves foraneas respectivas
-    @Column(name = "terminalId")
-    private String terminalId;
+    // TODO: validar si estan bien las relaciones
+    @JoinColumn(name = "terminalId")
+    @ManyToOne
+    private Terminal terminalId;
 
-    @Column(name = "permisoId")
-    private String permissionId;
+    @JoinColumn(name = "permisoId")
+    @ManyToOne
+    private Permission permissionId;
 
     @Column(name = "comentario")
     private String comment;

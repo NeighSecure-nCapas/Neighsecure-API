@@ -1,6 +1,7 @@
 package com.example.neighsecureapi.domain.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,12 +30,20 @@ public class User {
     private String phone;
 
     // TODO: ver como agregar varios roles
-    //@Column(name = "rolId")
-    //private List<String> rolId;
+    @Column(name = "rolId")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Role> rolId;
 
-    @Column(name = "casaId") // TODO: LLAVE FORANEA
-    private String homeId;
+    //@Column(name = "casaId") // TODO: validar si es correcto
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    private Home homeId;
 
     @Column(name = "dui")
     private String dui;
+
+    @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Permission> permissions;
 }

@@ -1,6 +1,7 @@
 package com.example.neighsecureapi.domain.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,11 +26,19 @@ public class Home {
     @Column(name = "direccion")
     private String address;
 
-    // TODO: agregar llaves foraneas respectivas
+    // TODO: validar si es correcto, ya q no me deja hacer la relacion con el id correcto
     @Column(name = "usuarioIdEncargado")
-    private String homeOwnerId;
+    @OneToOne(mappedBy = "homeid", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User homeOwnerId;
 
-    // TODO: agregar llaves foraneas respectivas y ver como hacer para almacenar varios id de habitantes
-    //@Column(name = "usuarioIdHabitante")
-    //private List<String> homeMemberId;
+    // TODO: validar si es correcto
+    @Column(name = "usuarioIdHabitante")
+    @OneToMany(mappedBy = "homeId", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<User> homeMemberId;
+
+    @OneToMany(mappedBy = "homeId", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Permission> permissions;
 }

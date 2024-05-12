@@ -27,4 +27,7 @@ public class Key {
 
     @Column(name = "diaGenerado")
     private String generationDay;
+
+    //@OneToOne
+    //private Permission permissionId;
 }

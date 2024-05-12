@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,4 +20,7 @@ public class Terminal {
 
     @Column(name = "tipoEntrada")
     private String entryType; // podria ser un enum (? peatonal o vehicular
+
+    @OneToMany(mappedBy = "terminalId", fetch = FetchType.LAZY)
+    private List<Entry> entries;
 }

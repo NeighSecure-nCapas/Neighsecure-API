@@ -1,6 +1,7 @@
 package com.example.neighsecureapi.domain.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,9 +40,10 @@ public class Permission {
     @Column(name = "estado")
     private boolean status;
 
-    // TODO: agregar llaves foraneas respectivas
-    @Column(name = "llaveId")
-    private String keyId;
+    // TODO: validar si esta bien la relacion
+    @JoinColumn(name = "llaveId")
+    @OneToOne
+    private Key keyId;
 
     @Column(name = "fechaGeneracion")
     private Date generationDate;
@@ -50,9 +52,15 @@ public class Permission {
     //@Column(name = "dias")
     //private List<String> days;
 
-    @Column(name = "casaId") // TODO: LLAVE FORANEA
-    private String homeId;
+    @JoinColumn(name = "casaId") // TODO: LLAVE FORANEA
+    @ManyToOne
+    private Home homeId;
 
-    @Column(name = "usuarioId") // TODO: LLAVE FORANEA
-    private String userId;
+    @JoinColumn(name = "usuarioId") // TODO: LLAVE FORANEA
+    @ManyToOne
+    private User userId;
+
+    @OneToMany(mappedBy = "permisoId", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private List<Entry> entries;
 }
