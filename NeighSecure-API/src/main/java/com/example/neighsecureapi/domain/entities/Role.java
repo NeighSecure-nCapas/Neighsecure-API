@@ -1,5 +1,6 @@
 package com.example.neighsecureapi.domain.entities;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,8 +9,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Entity
+@Table(name = "Rol")
 public class Role {
-    // TODO: agregar anotaciones de JPA y cambiar nombres de atributos segun diccionario de datos
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "rolId")
     private String rolId;
+
+    @Column(name = "rol")
     private String rol;
 }

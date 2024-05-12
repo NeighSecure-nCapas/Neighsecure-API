@@ -1,0 +1,20 @@
+#spring.application.name=NeighSecure-API
+
+
+spring:
+  application:
+    name: NeighSecure-API
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:postgresql://localhost:5432/neighsecure #jdbc:mysql://localhost:3306/neighsecure?useSSL=false
+    username: postgres
+    password: florerUWU!comadikWSL2
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        globally_quoted_identifiers: true
+    show-sql: true
