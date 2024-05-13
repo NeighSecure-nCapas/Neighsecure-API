@@ -33,7 +33,7 @@ public class Home {
     private User homeOwnerId;
 
     // TODO: validar si es correcto
-    @Column(name = "usuarioIdHabitante")
+    @Column(name = "usuarioIdHabitante", nullable = true)
     @OneToMany(mappedBy = "homeId", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<User> homeMemberId;

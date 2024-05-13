@@ -32,6 +32,6 @@ public class Entry {
     @ManyToOne
     private Permission permissionId;
 
-    @Column(name = "comentario")
+    @Column(name = "comentario", nullable = true)
     private String comment;
 }

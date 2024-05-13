@@ -35,7 +35,7 @@ public class User {
     @JsonIgnore
     private List<Role> rolId;
 
-    //@Column(name = "casaId") // TODO: validar si es correcto
+    @Column(name = "casaId", nullable = true) // TODO: validar si es correcto
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnore
     private Home homeId;
