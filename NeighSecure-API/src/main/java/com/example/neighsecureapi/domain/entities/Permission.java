@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -19,7 +20,7 @@ public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "permisoId")
-    private String id;
+    private UUID id;
 
     @Column(name = "tipoPermiso")
     private String type;

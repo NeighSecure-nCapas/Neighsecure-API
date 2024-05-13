@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 // TODO: agregar anotaciones de JPA
 @Data
@@ -18,7 +19,7 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "rolId")
-    private String rolId;
+    private UUID rolId;
 
     @Column(name = "rol")
     private String rol;

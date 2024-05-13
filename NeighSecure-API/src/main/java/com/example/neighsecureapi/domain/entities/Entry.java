@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.UUID;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -18,7 +19,7 @@ public class Entry {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "entradaId")
-    private String id;
+    private UUID id;
 
     @Column(name = "fechaYHora")
     private Date entryDate;

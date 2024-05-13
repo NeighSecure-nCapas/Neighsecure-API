@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +17,7 @@ public class Terminal {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "terminalId")
-    private String terminalId;
+    private UUID terminalId;
 
     @Column(name = "tipoEntrada")
     private String entryType; // podria ser un enum (? peatonal o vehicular

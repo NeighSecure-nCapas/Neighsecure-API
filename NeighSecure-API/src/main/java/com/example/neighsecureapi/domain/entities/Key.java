@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +17,7 @@ public class Key {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "llaveId")
-    private String keyId;
+    private UUID keyId;
 
     // TODO: validar formatos de fecha y horas
     @Column(name = "fechaGenerada")

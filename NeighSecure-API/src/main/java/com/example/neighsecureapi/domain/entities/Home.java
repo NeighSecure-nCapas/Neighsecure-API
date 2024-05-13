@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -18,7 +19,7 @@ public class Home {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "casaId")
-    private String id;
+    private UUID id;
 
     @Column(name = "numeroCasa")
     private int homeNumber;
