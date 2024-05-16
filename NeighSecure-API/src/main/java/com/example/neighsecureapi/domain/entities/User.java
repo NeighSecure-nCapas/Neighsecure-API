@@ -44,6 +44,9 @@ public class User {
     @Column(name = "dui")
     private String dui;
 
+    @Column(name = "estadoUser")
+    private boolean status;
+
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Permission> permissions;
