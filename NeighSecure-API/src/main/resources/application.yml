@@ -8,7 +8,7 @@ spring:
     init:
       mode: always
   datasource:
-    url: jdbc:postgresql://localhost:5432/neighsecure #jdbc:mysql://localhost:3306/neighsecure?useSSL=false
+    url: jdbc:postgresql://localhost:5432/postgres #jdbc:mysql://localhost:3306/neighsecure?useSSL=false
     username: postgres
     password: florerUWU!comadikWSL2
   jpa:

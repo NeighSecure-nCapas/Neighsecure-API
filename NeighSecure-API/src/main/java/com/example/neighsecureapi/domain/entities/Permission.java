@@ -61,7 +61,7 @@ public class Permission {
     @ManyToOne
     private User userId;
 
-    @OneToMany(mappedBy = "permisoId", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Entry> entries;
 }

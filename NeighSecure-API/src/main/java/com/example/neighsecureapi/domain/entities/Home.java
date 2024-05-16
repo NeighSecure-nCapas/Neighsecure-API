@@ -28,8 +28,8 @@ public class Home {
     private String address;
 
     // TODO: validar si es correcto, ya q no me deja hacer la relacion con el id correcto
-    @Column(name = "usuarioIdEncargado")
-    @OneToOne(mappedBy = "homeid", fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuarioIdEncargado")
+    @OneToOne(fetch = FetchType.LAZY)
     @JsonIgnore
     private User homeOwnerId;
 
