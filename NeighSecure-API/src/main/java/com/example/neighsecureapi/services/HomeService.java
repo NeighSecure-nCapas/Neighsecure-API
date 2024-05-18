@@ -1,17 +1,19 @@
 package com.example.neighsecureapi.services;
 
+import com.example.neighsecureapi.domain.dtos.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.entities.Home;
+import com.example.neighsecureapi.domain.entities.User;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface HomeService {
 
-    // CRUD IMPLEMENTATION FOR HOME ENTITY
-    // TODO: implementar dtos
-    public void saveHome(String homeName, String homeAddress);
-    public void deleteHome(String homeId);
-    public void updateHome(String homeName, String homeAddress);
-    public Home getHome(String homeName);
+    // CRUD IMPLEMENTATION FOR HOME ENTITY -----------------------------------------------------------
+    public void saveHome(HomeRegisterDTO info, User userAdmin, List<User> homeMembers);
+    public void deleteHome(UUID homeId);
+    public void updateHome(Home home, HomeRegisterDTO info);
+    public Home getHome(UUID homeId);
 
     // TODO: implementar pagination
     public List<Home> getAllHomes();
@@ -21,16 +23,14 @@ public interface HomeService {
     // ADDITIONAL METHODS ----------------------------------------------------------------------------
 
     // METHODS FOR HOME MEMBERS -----------------------------------------------------------------------
-    public void addHomeMembers(String homeName, String homeAddress, String homeMembers);
-    public void removeHomeMembers(String homeName, String homeAddress, String homeMembers);
+    public void addHomeMembers(Home home, User homeMember);
+    public void removeHomeMembers(Home home, User homeMemberDel);
 
     // METHODS FOR HOME ADMINS ------------------------------------------------------------------------
-    public void addHomeAdmin(String homeName, String homeAddress, String homeAdmins);
+    public void updateHomeAdmin(Home home, User homeAdmin);
     public void removeHomeAdmin(String homeName, String homeAddress, String homeAdmins);
-    // TODO: validar si es necesaria la funcionalidad de actualizar el admin
-    public void updateHomeAdmin(String homeName, String homeAddress, String homeAdmins);
 
-    // obtener el numero de hogares registrados
-    public Integer getHomesNumber();
+    // METHODS FOR HOME MEMBERS VALIDATION ------------------------------------------------------------------------
+    public boolean validateHomeMembersCapacity(Home home);
 
 }
