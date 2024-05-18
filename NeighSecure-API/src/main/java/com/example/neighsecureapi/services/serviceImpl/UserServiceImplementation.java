@@ -57,6 +57,7 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public List<User> getAllUsers() {
+        // TODO: implementar paginacion y buscar solo los activos
         return userRepository.findAll();
     }
 

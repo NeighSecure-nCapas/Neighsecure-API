@@ -64,6 +64,7 @@ public class HomeServiceImplementation implements HomeService {
 
     @Override
     public List<Home> getAllHomes() {
+        // TODO: implementar paginacion y buscar solo los activos
         return homeRepository.findAll();
     }
 

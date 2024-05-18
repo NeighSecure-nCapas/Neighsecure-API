@@ -38,8 +38,11 @@ public class Permission {
     @Column(name = "horaFin")
     private Date endTime;
 
-    @Column(name = "estado")
+    @Column(name = "estado")// aprobado true, pendiente false
     private boolean status;
+
+    @Column(name = "vigente")// aun es utilizable true, ya no false
+    private boolean valid;
 
     // TODO: validar si esta bien la relacion
     @JoinColumn(name = "llaveId")
