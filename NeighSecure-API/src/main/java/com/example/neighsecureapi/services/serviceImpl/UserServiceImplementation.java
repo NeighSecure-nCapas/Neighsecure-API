@@ -57,20 +57,28 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        // TODO: implementar paginacion y buscar solo los activos
-        return userRepository.findAll();
+        // TODO: implementar paginacion
+        return userRepository.findAllByStatusTrue();
+    }
+
+    @Override
+    public void addRoleToUser(User user, Role role) {
+        user.getRolId().add(role);
+        userRepository.save(user);
     }
 
     @Override
     public void updateRoleToUser(User user, Role role) {
 
-        user.getRolId().add(role);
+        // setea el rol como una lista de un nuevo rol
+        user.setRolId(List.of(role));
         userRepository.save(user);
 
     }
 
     @Override
     public User findUserByEmail(String email) {
+
         return userRepository.findByEmail(email);
     }
 
