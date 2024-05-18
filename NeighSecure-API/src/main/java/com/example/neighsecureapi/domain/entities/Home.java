@@ -42,4 +42,10 @@ public class Home {
     @OneToMany(mappedBy = "homeId", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Permission> permissions;
+
+    @Column(name = "estadoCasa")
+    private boolean status;
+
+    @Column(name = "numeroMiembros")
+    private int membersNumber;
 }
