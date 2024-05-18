@@ -25,6 +25,7 @@ public interface UserService {
 
     // ADDITIONAL METHODS
     public void updateRoleToUser(UUID userId, Role role);
+    public User findUserByEmail(String email);
 
     // Integer getUsersNumberByRole(String date, String roleId);
     // public void removeRoleFromUser(String userId, String roleId);
