@@ -62,13 +62,10 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void updateRoleToUser(UUID userId, Role role) {
-        User user = userRepository.findById(userId).orElse(null);
+    public void updateRoleToUser(User user, Role role) {
 
-        if (user != null) {
-            user.getRolId().add(role);
-            userRepository.save(user);
-        }
+        user.getRolId().add(role);
+        userRepository.save(user);
 
     }
 

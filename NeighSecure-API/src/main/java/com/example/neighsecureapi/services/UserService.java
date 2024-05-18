@@ -24,7 +24,7 @@ public interface UserService {
     // END OF CRUD IMPLEMENTATION
 
     // ADDITIONAL METHODS
-    public void updateRoleToUser(UUID userId, Role role);
+    public void updateRoleToUser(User user, Role role);
     public User findUserByEmail(String email);
 
     // Integer getUsersNumberByRole(String date, String roleId);

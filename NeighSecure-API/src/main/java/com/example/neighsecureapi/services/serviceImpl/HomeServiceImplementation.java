@@ -45,16 +45,14 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
-    public void updateHome(UUID homeid, HomeRegisterDTO info) {
-        Home home = homeRepository.findById(homeid).orElse(null);
+    public void updateHome(Home home, HomeRegisterDTO info) {
 
-        if (home != null) {
-            if(info.getHomeNumber() != null) home.setHomeNumber(info.getHomeNumber());
-            if(info.getAddress() != null) home.setAddress(info.getAddress());
-            if(info.getMembersNumber() != null) home.setMembersNumber(info.getMembersNumber());
+        if(info.getHomeNumber() != null) home.setHomeNumber(info.getHomeNumber());
+        if(info.getAddress() != null) home.setAddress(info.getAddress());
+        if(info.getMembersNumber() != null) home.setMembersNumber(info.getMembersNumber());
 
-            homeRepository.save(home);
-        }
+        homeRepository.save(home);
+
     }
 
     @Override
@@ -64,47 +62,39 @@ public class HomeServiceImplementation implements HomeService {
 
     @Override
     public List<Home> getAllHomes() {
-        // TODO: implementar paginacion y buscar solo los activos
-        return homeRepository.findAll();
+        // TODO: implementar paginacion
+        return homeRepository.findAllByStatusIsTrue();
     }
 
     @Override
-    public void addHomeMembers(UUID homeId, User homeMember) {
-        Home home = homeRepository.findById(homeId).orElse(null);
+    public void addHomeMembers(Home home, User homeMember) {
 
-        if (home != null) {
-            // agregar los miembros a la lista de miembros
-            List<User> currentMembers = home.getHomeMemberId();
+        // agregar los miembros a la lista de miembros
+        List<User> currentMembers = home.getHomeMemberId();
 
-            // ya debe estar validado que cabe el nuevo miembro
-            currentMembers.add(homeMember);
+        // ya debe estar validado que cabe el nuevo miembro
+        currentMembers.add(homeMember);
 
-            homeRepository.save(home);
-        }
+        homeRepository.save(home);
+
     }
 
     @Override
-    public void removeHomeMembers(UUID homeId, User homeMemberDel) {
-        Home home = homeRepository.findById(homeId).orElse(null);
+    public void removeHomeMembers(Home home, User homeMemberDel) {
 
-        if (home != null) {
-            List<User> currentMembers = home.getHomeMemberId();
+        // Debe estar validado que el miembro a eliminar exista y sea parte de la lista
+        home.getHomeMemberId().remove(homeMemberDel);
 
-            // Debe estar validado que el miembro a eliminar exista y sea parte de la lista
-            currentMembers.remove(homeMemberDel);
+        homeRepository.save(home);
 
-            homeRepository.save(home);
-        }
     }
 
     @Override
-    public void updateHomeAdmin(UUID homeId, User homeAdmin) {
-        Home home = homeRepository.findById(homeId).orElse(null);
+    public void updateHomeAdmin(Home home, User homeAdmin) {
 
-        if (home != null) {
-            home.setHomeOwnerId(homeAdmin);
-            homeRepository.save(home);
-        }
+        home.setHomeOwnerId(homeAdmin);
+        homeRepository.save(home);
+
     }
 
     @Override
@@ -113,11 +103,10 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
-    public boolean validateHomeMembersCapacity(UUID homeId) {
-        Home home = homeRepository.findById(homeId).orElse(null);
+    public boolean validateHomeMembersCapacity(Home home) {
 
-        // capacidad maxima de miembros de la casa, el admin no cuenta
-        assert home != null;
+        /*
+        * // capacidad maxima de miembros de la casa, el admin no cuenta
         int capacity = home.getMembersNumber();
 
         // cantidad de miembros actuales
@@ -125,6 +114,9 @@ public class HomeServiceImplementation implements HomeService {
 
         // la cantidad actual de miembros mas el nuevo miembro no debe ser mayor a la capacidad
         return (currentMembers + 1) <= capacity;
+        * */
+
+        return (home.getHomeMemberId().size() + 1) <= home.getMembersNumber();
     }
 
 }

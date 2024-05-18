@@ -12,7 +12,7 @@ public interface HomeService {
     // CRUD IMPLEMENTATION FOR HOME ENTITY -----------------------------------------------------------
     public void saveHome(HomeRegisterDTO info, User userAdmin, List<User> homeMembers);
     public void deleteHome(UUID homeId);
-    public void updateHome(UUID homeid, HomeRegisterDTO info);
+    public void updateHome(Home home, HomeRegisterDTO info);
     public Home getHome(UUID homeId);
 
     // TODO: implementar pagination
@@ -23,14 +23,14 @@ public interface HomeService {
     // ADDITIONAL METHODS ----------------------------------------------------------------------------
 
     // METHODS FOR HOME MEMBERS -----------------------------------------------------------------------
-    public void addHomeMembers(UUID homeId, User homeMember);
-    public void removeHomeMembers(UUID homeId, User homeMemberDel);
+    public void addHomeMembers(Home home, User homeMember);
+    public void removeHomeMembers(Home home, User homeMemberDel);
 
     // METHODS FOR HOME ADMINS ------------------------------------------------------------------------
-    public void updateHomeAdmin(UUID homeId, User homeAdmin);
+    public void updateHomeAdmin(Home home, User homeAdmin);
     public void removeHomeAdmin(String homeName, String homeAddress, String homeAdmins);
 
     // METHODS FOR HOME MEMBERS VALIDATION ------------------------------------------------------------------------
-    public boolean validateHomeMembersCapacity(UUID homeId);
+    public boolean validateHomeMembersCapacity(Home home);
 
 }
