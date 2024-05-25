@@ -41,10 +41,12 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<GeneralResponse> getAllUsers() {
 
+        // TODO: VERIFICAR SI TENGO QUE MANDAR EL UUID SIEMPRE QUE MANDO USUARIOS
         // se mapea la lista de usuarios a un dto para no enviar la data sensible
         List<UserResponseDTO> users = userService.getAllUsers()
                 .stream().map(user -> {
                     UserResponseDTO userResponseDTO = new UserResponseDTO();
+                    userResponseDTO.setId(user.getId());
                     userResponseDTO.setName(user.getName());
                     userResponseDTO.setEmail(user.getEmail());
                     userResponseDTO.setPhone(user.getPhone());
@@ -147,6 +149,30 @@ public class AdminController {
                 new GeneralResponse.Builder()
                         .message("Dashboard obtenido con exito")
                         .data(dashboard)
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/homes")
+    public ResponseEntity<GeneralResponse> getAllHomes() {
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Casas obtenidas con exito")
+                        .data(homeService.getAllHomes())
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/homes/{homeId}")
+    public ResponseEntity<GeneralResponse> getHome(@PathVariable UUID homeId) {
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Casa obtenida con exito")
+                        .data(homeService.getHome(homeId))
                         .build(),
                 HttpStatus.OK
         );

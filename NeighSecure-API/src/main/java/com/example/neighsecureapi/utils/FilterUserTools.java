@@ -18,6 +18,7 @@ public class FilterUserTools {
             for (Role role : user.getRolId()) {
                 if (role.equals(roleFilter)) {
                     UserResponseDTO userResponseDTO = new UserResponseDTO();
+                    userResponseDTO.setId(user.getId());
                     userResponseDTO.setName(user.getName());
                     userResponseDTO.setEmail(user.getEmail());
                     userResponseDTO.setPhone(user.getPhone());
