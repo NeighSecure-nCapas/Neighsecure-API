@@ -3,7 +3,9 @@ package com.example.neighsecureapi.controllers;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterUserDTO;
 import com.example.neighsecureapi.domain.entities.Home;
+import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.User;
+import com.example.neighsecureapi.services.RoleService;
 import com.example.neighsecureapi.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -18,9 +20,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UserService userService;
+    private final RoleService roleService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @PostMapping("/register")
@@ -37,7 +41,9 @@ public class AuthController {
             );
         }
 
-        userService.saveUser(registerUserDTO);
+        Role rol = roleService.getRoleByName("Visitante");
+
+        userService.saveUser(registerUserDTO, rol);
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()

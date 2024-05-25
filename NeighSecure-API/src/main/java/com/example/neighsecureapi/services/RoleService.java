@@ -16,6 +16,7 @@ public interface RoleService {
     // public void updateRole(String roleName);
     public Role getRole(UUID roleId);
     public List<Role> getAllRoles();
+    public Role getRoleByName(String roleName);
 
     // END OF CRUD IMPLEMENTATION ---------------------------------------------------------------------
 

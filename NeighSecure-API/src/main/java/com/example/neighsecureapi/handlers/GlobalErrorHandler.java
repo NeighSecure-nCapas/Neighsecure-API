@@ -27,10 +27,10 @@ public class GlobalErrorHandler {
         //log.error("Error: ", e);
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Error interno del servidor")
+                        .message(e.getMessage())
                         .build(),
                 HttpStatus.INTERNAL_SERVER_ERROR
-        );
+        );// "Error interno en el servidor"
     }
 
     @ExceptionHandler(NoResourceFoundException.class)

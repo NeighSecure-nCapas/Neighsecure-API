@@ -24,13 +24,15 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void saveUser(RegisterUserDTO info) {
+    public void saveUser(RegisterUserDTO info, Role rol) {
         User user = new User();
 
         user.setName(info.getName());
         user.setEmail(info.getEmail());
         user.setDui(info.getDui());
         user.setHomeId(null);
+        user.setPhone(info.getPhone());
+        user.setRolId(List.of(rol));
         user.setStatus(true);
 
         userRepository.save(user);

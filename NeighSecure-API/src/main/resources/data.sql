@@ -13,6 +13,6 @@ INSERT INTO usuario (usuario_id, nombre_completo, correo, telefono, casa_id, dui
 VALUES ('6e4d596e-3a4f-4a24-92ec-d7b02dd657d7','fernando', 'fernando@gmail.com', '1234-5678', null, '0000000-1', true)
 ON CONFLICT DO NOTHING;
 
-INSERT INTO usuario_rol_id (users_usuario_id, rol_id_rol_id) VALUES ('6e4d596e-3a4f-4a24-92ec-d7b02dd657d7', '1f9c7e2e-9d3b-43a8-ae8f-62147b7e1c34') ON CONFLICT DO NOTHING;
+--INSERT INTO usuario_rol_id (users_usuario_id, rol_id_rol_id) VALUES ('6e4d596e-3a4f-4a24-92ec-d7b02dd657d7', '1f9c7e2e-9d3b-43a8-ae8f-62147b7e1c34') ON CONFLICT DO NOTHING;
 
 --INSERT INTO usuario_rol_id (users_usuario_id, rol_id_rol_id) VALUES (1, 1);

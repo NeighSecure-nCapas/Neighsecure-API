@@ -12,7 +12,7 @@ public interface UserService {
 
     // CRUD IMPLEMENTATION FOR USER ENTITY
     //TODO: implementar login
-    public void saveUser(RegisterUserDTO info);
+    public void saveUser(RegisterUserDTO info, Role role);
     public void deleteUser(UUID userId);
 
     public void updateUser(String username, String password);
