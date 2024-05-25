@@ -39,6 +39,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void deleteUser(UUID userId) {
         // no lo elimina de manera literal, solo lo desactiva
         User user = userRepository.findById(userId).orElse(null);
@@ -66,12 +67,14 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void addRoleToUser(User user, Role role) {
         user.getRolId().add(role);
         userRepository.save(user);
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void updateRoleToUser(User user, Role role) {
 
         // setea el rol como una lista de un nuevo rol
@@ -87,6 +90,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void addHomeToUser(User user, Home home) {
         user.setHomeId(home);
         userRepository.save(user);

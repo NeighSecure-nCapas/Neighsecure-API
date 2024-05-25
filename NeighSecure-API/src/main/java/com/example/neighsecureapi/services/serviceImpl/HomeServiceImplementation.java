@@ -5,6 +5,7 @@ import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.HomeRepository;
 import com.example.neighsecureapi.services.HomeService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,7 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void saveHome(HomeRegisterDTO info, User userAdmin, List<User> homeMembers) {
         Home home = new Home();
 
@@ -35,6 +37,7 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void deleteHome(UUID homeId) {
         Home home = homeRepository.findById(homeId).orElse(null);
 
@@ -45,6 +48,7 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void updateHome(Home home, HomeRegisterDTO info) {
 
         if(info.getHomeNumber() != null) home.setHomeNumber(info.getHomeNumber());
@@ -67,6 +71,7 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void addHomeMembers(Home home, User homeMember) {
 
         // agregar los miembros a la lista de miembros
@@ -80,6 +85,7 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void removeHomeMembers(Home home, User homeMemberDel) {
 
         // Debe estar validado que el miembro a eliminar exista y sea parte de la lista
@@ -90,6 +96,7 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void updateHomeAdmin(Home home, User homeAdmin) {
 
         home.setHomeOwnerId(homeAdmin);
@@ -98,6 +105,7 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void removeHomeAdmin(String homeName, String homeAddress, String homeAdmins) {
 
     }
