@@ -7,6 +7,7 @@ import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.UserRepository;
 import com.example.neighsecureapi.services.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,13 +23,14 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public void saveUser(RegisterUserDTO info, Home casa) {
+    @Transactional(rollbackOn = Exception.class)
+    public void saveUser(RegisterUserDTO info) {
         User user = new User();
 
         user.setName(info.getName());
         user.setEmail(info.getEmail());
         user.setDui(info.getDui());
-        user.setHomeId(casa);
+        user.setHomeId(null);
         user.setStatus(true);
 
         userRepository.save(user);
@@ -80,6 +82,12 @@ public class UserServiceImplementation implements UserService {
     public User findUserByEmail(String email) {
 
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public void addHomeToUser(User user, Home home) {
+        user.setHomeId(home);
+        userRepository.save(user);
     }
 
 }

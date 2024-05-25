@@ -12,7 +12,7 @@ public interface UserService {
 
     // CRUD IMPLEMENTATION FOR USER ENTITY
     //TODO: implementar login
-    public void saveUser(RegisterUserDTO info, Home casa);
+    public void saveUser(RegisterUserDTO info);
     public void deleteUser(UUID userId);
 
     public void updateUser(String username, String password);
@@ -27,6 +27,7 @@ public interface UserService {
     public void addRoleToUser(User user, Role role);
     public void updateRoleToUser(User user, Role role);
     public User findUserByEmail(String email);
+    public void addHomeToUser(User user, Home home);
 
     // Integer getUsersNumberByRole(String date, String roleId);
     // public void removeRoleFromUser(String userId, String roleId);
