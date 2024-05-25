@@ -1,6 +1,5 @@
-package com.example.neighsecureapi.domain.dtos;
+package com.example.neighsecureapi.domain.dtos.userDTOs;
 
-import com.example.neighsecureapi.domain.entities.Home;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

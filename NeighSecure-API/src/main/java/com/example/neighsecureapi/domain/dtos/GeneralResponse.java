@@ -37,6 +37,7 @@ public class GeneralResponse {
         }
     }
 
+    /*
     public static ResponseEntity<GeneralResponse> getResponse(HttpStatus status, String message, Object data){
         return new ResponseEntity<>(
                 new Builder().message(message).data(data).build(),
@@ -78,6 +79,7 @@ public class GeneralResponse {
                 status
         );
     }
+    * */
 
     // agregar nuevos metodos de ser necesario
 
