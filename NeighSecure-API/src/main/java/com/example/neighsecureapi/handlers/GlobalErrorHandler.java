@@ -25,7 +25,10 @@ public class GlobalErrorHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<GeneralResponse> GeneralHandler(Exception e){
         //log.error("Error: ", e);
-        return GeneralResponse.getResponse(
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Error interno del servidor")
+                        .build(),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
@@ -33,7 +36,10 @@ public class GlobalErrorHandler {
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<GeneralResponse> ResourceNotFoundHandler(NoResourceFoundException e){
         //log.error("Error: ", e);
-        return GeneralResponse.getResponse(
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("No se encontro el recurso solicitado")
+                        .build(),
                 HttpStatus.NOT_FOUND
         );
     }
@@ -41,18 +47,25 @@ public class GlobalErrorHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<GeneralResponse> BadRequestHandler(MethodArgumentNotValidException ex){
         //log.error("Error: ", ex);
-        return GeneralResponse.getResponse(
-                HttpStatus.BAD_REQUEST,
-                errorsTools.mapErrors(ex.getBindingResult().getFieldErrors())
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Error en los datos enviados")
+                        .data(errorsTools.mapErrors(ex.getBindingResult().getFieldErrors()))
+                        .build(),
+                HttpStatus.BAD_REQUEST
         );
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<GeneralResponse> IllegalArgumentHandler(IllegalArgumentException e){
         //log.error("Error: ", e);
-        return GeneralResponse.getResponse(
-                HttpStatus.BAD_REQUEST,
-                e.getMessage()
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Error en los datos enviados")
+                        .data(e.getMessage())
+                        .build(),
+                HttpStatus.BAD_REQUEST
         );
+
     }
 }
