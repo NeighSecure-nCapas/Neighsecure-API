@@ -86,7 +86,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public User findUserByEmail(String email) {
 
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     @Override
@@ -94,6 +94,11 @@ public class UserServiceImplementation implements UserService {
     public void addHomeToUser(User user, Home home) {
         user.setHomeId(home);
         userRepository.save(user);
+    }
+
+    @Override
+    public User findUserByEmailAndDui(String email, String dui) {
+        return userRepository.findByEmailAndAndDui(email, dui).orElse(null);
     }
 
 }

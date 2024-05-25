@@ -23,14 +23,14 @@ public class HomeServiceImplementation implements HomeService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void saveHome(HomeRegisterDTO info, User userAdmin, List<User> homeMembers) {
+    public void saveHome(HomeRegisterDTO info) {
         Home home = new Home();
 
         home.setHomeNumber(info.getHomeNumber());
         home.setAddress(info.getAddress());
-        home.setHomeOwnerId(userAdmin);
+        home.setHomeOwnerId(info.getUserAdmin());
         home.setStatus(true);
-        home.setHomeMemberId(homeMembers);
+        home.setHomeMemberId(info.getHomeMembers());
         home.setMembersNumber(info.getMembersNumber());
 
         homeRepository.save(home);
@@ -38,13 +38,11 @@ public class HomeServiceImplementation implements HomeService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void deleteHome(UUID homeId) {
-        Home home = homeRepository.findById(homeId).orElse(null);
+    public void deleteHome(Home home) {
 
-        if (home != null) {
-            home.setStatus(false);
-            homeRepository.save(home);
-        }
+        home.setStatus(false);
+        homeRepository.save(home);
+
     }
 
     @Override
@@ -61,13 +59,13 @@ public class HomeServiceImplementation implements HomeService {
 
     @Override
     public Home getHome(UUID homeId) {
-        return homeRepository.findById(homeId).orElse(null);
+        return homeRepository.findByStatusIsTrueAndId(homeId).orElse(null);
     }
 
     @Override
     public List<Home> getAllHomes() {
         // TODO: implementar paginacion
-        return homeRepository.findAllByStatusIsTrue();
+        return homeRepository.findAllByStatusIsTrue().orElse(null);
     }
 
     @Override
@@ -108,6 +106,11 @@ public class HomeServiceImplementation implements HomeService {
     @Transactional(rollbackOn = Exception.class)
     public void removeHomeAdmin(String homeName, String homeAddress, String homeAdmins) {
 
+    }
+
+    @Override
+    public Home findHomeByAddressAndHomeNumber(String address, Integer homeNumber) {
+        return homeRepository.findByAddressAndHomeNumber(address, homeNumber).orElse(null);
     }
 
     @Override

@@ -2,25 +2,23 @@ package com.example.neighsecureapi.controllers;
 
 
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
+import com.example.neighsecureapi.domain.dtos.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.DashboardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.UserResponseDTO;
+import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.User;
+import com.example.neighsecureapi.repositories.HomeRepository;
 import com.example.neighsecureapi.services.HomeService;
 import com.example.neighsecureapi.services.RoleService;
 import com.example.neighsecureapi.services.UserService;
 import com.example.neighsecureapi.utils.FilterUserTools;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/neighSecure/admin")
@@ -30,13 +28,17 @@ public class AdminController {
     private final HomeService homeService;
     private final FilterUserTools filterUserTools;
     private final RoleService roleService;
+    private final HomeRepository homeRepository;
 
-    public AdminController(UserService userService, HomeService homeService, FilterUserTools filterUserTools, RoleService roleService) {
+    public AdminController(UserService userService, HomeService homeService, FilterUserTools filterUserTools, RoleService roleService, HomeRepository homeRepository) {
         this.userService = userService;
         this.homeService = homeService;
         this.filterUserTools = filterUserTools;
         this.roleService = roleService;
+        this.homeRepository = homeRepository;
     }
+
+    // USER SECTION --------------------------------------------------------------
 
     @GetMapping("/users")
     public ResponseEntity<GeneralResponse> getAllUsers() {
@@ -87,7 +89,7 @@ public class AdminController {
         );
     }
 
-    @GetMapping("/users/delete/{userId}")
+    @PatchMapping("/users/delete/{userId}")
     public ResponseEntity<GeneralResponse> deleteUser(@PathVariable UUID userId) {
 
         User user = userService.getUser(userId);
@@ -132,6 +134,31 @@ public class AdminController {
         );
     }
 
+    @GetMapping("/users/dui_email/{dui}/{email}")
+    public ResponseEntity<GeneralResponse> getUsersByDuiOrEmail(@PathVariable String dui, @PathVariable String email) {
+
+        User user = userService.findUserByEmailAndDui(email, dui);
+
+        if(user == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Usuario no encontrado")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Usuarios obtenidos con exito")
+                        .data(user)
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    // DASHBOARD SECTION --------------------------------------------------------------
+
     @GetMapping("/dashboard")
     public ResponseEntity<GeneralResponse> getDashboard() {
 
@@ -154,6 +181,8 @@ public class AdminController {
         );
     }
 
+    // HOME SECTION --------------------------------------------------------------
+
     @GetMapping("/homes")
     public ResponseEntity<GeneralResponse> getAllHomes() {
 
@@ -173,6 +202,78 @@ public class AdminController {
                 new GeneralResponse.Builder()
                         .message("Casa obtenida con exito")
                         .data(homeService.getHome(homeId))
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/homes/register")
+    public ResponseEntity<GeneralResponse> registerHome(@RequestBody HomeRegisterDTO info) {
+
+        Home home = homeRepository.findByAddressAndHomeNumber(info.getAddress(), info.getHomeNumber()).orElse(null);
+
+        if(home != null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("La casa ya esta registrada")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        homeService.saveHome(info);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Casa registrada con exito")
+                        .build(),
+                HttpStatus.CREATED
+        );
+    }
+
+    @PatchMapping("/homes/update/{homeId}")
+    public ResponseEntity<GeneralResponse> updateHome(@PathVariable UUID homeId, @RequestBody HomeRegisterDTO info) {
+
+        Home home = homeService.getHome(homeId);
+
+        if(home == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Casa no encontrada")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        homeService.updateHome(home, info);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Casa actualizada con exito")
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PatchMapping("/homes/delete/{homeId}")
+    public ResponseEntity<GeneralResponse> deleteHome(@PathVariable UUID homeId) {
+
+        Home home = homeService.getHome(homeId);
+
+        if(home == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Casa no encontrada")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        homeService.deleteHome(home);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Casa eliminada con exito")
                         .build(),
                 HttpStatus.OK
         );
