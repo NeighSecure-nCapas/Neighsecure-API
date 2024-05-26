@@ -25,14 +25,14 @@ public class UserHomeTools {
 
         // actualizar el rol del usuario individual
         userService.updateRoleToUser(user, rolAdm);
-        userService.updateHomeToUser(user, home);
+        //userService.updateHomeToUser(user, home);
 
         // cambiar el rol de los usuarios de la lista
 
         for(User member : homeMembers) {
             if (!member.equals(user)) { // Evita la recursión en el usuario administrador
                 userService.updateRoleToUser(member, rolMember);
-                userService.updateHomeToUser(member, home);
+                //userService.updateHomeToUser(member, home);
             }
         }
 

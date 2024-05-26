@@ -1,6 +1,7 @@
 package com.example.neighsecureapi.domain.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -29,18 +30,21 @@ public class Home {
 
     // TODO: validar si es correcto, ya q no me deja hacer la relacion con el id correcto
     @JoinColumn(name = "usuarioIdEncargado")
-    @OneToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonBackReference
+    @OneToOne(fetch = FetchType.EAGER)
+    //@JsonIgnore
     private User homeOwnerId;
 
     // TODO: validar si es correcto
     @Column(name = "usuarioIdHabitante", nullable = true)
-    @OneToMany(mappedBy = "homeId", fetch = FetchType.LAZY)
-    @JsonIgnore
+    @JsonBackReference
+    @OneToMany(fetch = FetchType.EAGER)// mappedBy = "homeId",
+    //@JsonIgnore
     private List<User> homeMemberId;
 
+    @JsonBackReference
     @OneToMany(mappedBy = "homeId", fetch = FetchType.LAZY)
-    @JsonIgnore
+    //@JsonIgnore
     private List<Permission> permissions;
 
     @Column(name = "estadoCasa")

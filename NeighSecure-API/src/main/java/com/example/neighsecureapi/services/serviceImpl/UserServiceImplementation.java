@@ -31,7 +31,7 @@ public class UserServiceImplementation implements UserService {
         user.setName(info.getName());
         user.setEmail(info.getEmail());
         user.setDui(info.getDui());
-        user.setHomeId(null);
+        //user.setHomeId(null);
         user.setPhone(info.getPhone());
         user.setRolId(List.of(rol));
         user.setStatus(true);
@@ -93,23 +93,27 @@ public class UserServiceImplementation implements UserService {
         return userRepository.findByEmail(email).orElse(null);
     }
 
+    /*
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void addHomeToUser(User user, Home home) {
         user.setHomeId(home);
         userRepository.save(user);
     }
+    * */
 
     @Override
     public User findUserByEmailAndDui(String email, String dui) {
         return userRepository.findByEmailAndAndDui(email, dui).orElse(null);
     }
 
+    /*
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void updateHomeToUser(User user, Home home) {
         user.setHomeId(home);
         userRepository.save(user);
     }
+    * */
 
 }

@@ -57,7 +57,7 @@ public class HomeServiceImplementation implements HomeService {
         home.setHomeOwnerId(info.getUserAdmin());
         home.setHomeMemberId(info.getHomeMembers());
 
-        homeRepository.save(home);
+        //homeRepository.save(home);
 
     }
 
@@ -70,6 +70,11 @@ public class HomeServiceImplementation implements HomeService {
     public List<Home> getAllHomes() {
         // TODO: implementar paginacion
         return homeRepository.findAllByStatusIsTrue().orElse(null);
+    }
+
+    @Override
+    public Home findHomeByUser(User user) {
+        return homeRepository.findByHomeOwnerIdOrHomeMemberIdAndStatusIsTrue(user, user).orElse(null);
     }
 
     @Override

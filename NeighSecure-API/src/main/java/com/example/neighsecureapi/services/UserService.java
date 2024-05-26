@@ -27,9 +27,9 @@ public interface UserService {
     public void addRoleToUser(User user, Role role);
     public void updateRoleToUser(User user, Role role);
     public User findUserByEmail(String email);
-    public void addHomeToUser(User user, Home home);
+    //public void addHomeToUser(User user, Home home);
     public User findUserByEmailAndDui(String email, String dui);
-    public void updateHomeToUser(User user, Home home);
+    //public void updateHomeToUser(User user, Home home);
 
     // Integer getUsersNumberByRole(String date, String roleId);
     // public void removeRoleFromUser(String userId, String roleId);

@@ -21,6 +21,7 @@ public interface HomeService {
     // END OF CRUD IMPLEMENTATION ---------------------------------------------------------------------
 
     // ADDITIONAL METHODS ----------------------------------------------------------------------------
+    public Home findHomeByUser(User user);
 
     // METHODS FOR HOME MEMBERS -----------------------------------------------------------------------
     public void addHomeMembers(Home home, User homeMember);
@@ -33,5 +34,6 @@ public interface HomeService {
 
     // METHODS FOR HOME MEMBERS VALIDATION ------------------------------------------------------------------------
     public boolean validateHomeMembersCapacity(Home home);
+
 
 }

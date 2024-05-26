@@ -16,6 +16,7 @@ import com.example.neighsecureapi.repositories.HomeRepository;
 import com.example.neighsecureapi.services.*;
 import com.example.neighsecureapi.utils.FilterUserTools;
 import com.example.neighsecureapi.utils.UserHomeTools;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/neighSecure/admin")
+@Slf4j
 public class AdminController {
 
     private final UserService userService;
@@ -53,8 +55,8 @@ public class AdminController {
     @GetMapping("/users")
     public ResponseEntity<GeneralResponse> getAllUsers() {
 
-        // TODO: VERIFICAR SI TENGO QUE MANDAR EL UUID SIEMPRE QUE MANDO USUARIOS
         // se mapea la lista de usuarios a un dto para no enviar la data sensible
+        // TODO: VER SI HAY PEDILLOS CON EL HOME NUMBER POR QUE UN USUARIO SOLO PUEDE ESTAR EN UNA CASA
         List<UserResponseDTO> users = userService.getAllUsers()
                 .stream().map(user -> {
                     UserResponseDTO userResponseDTO = new UserResponseDTO();
@@ -63,7 +65,9 @@ public class AdminController {
                     userResponseDTO.setEmail(user.getEmail());
                     userResponseDTO.setPhone(user.getPhone());
                     userResponseDTO.setDui(user.getDui());
-                    userResponseDTO.setHomeNumber(user.getHomeId() != null ? user.getHomeId().getHomeNumber() : 0);
+                    // obtener el numero de casa del usuario
+                    userResponseDTO.setHomeNumber(homeService.findHomeByUser(user) != null ? homeService.findHomeByUser(user).getHomeNumber() : 0);
+
                     return userResponseDTO;
                 }).toList();
 
@@ -72,7 +76,7 @@ public class AdminController {
                         .message("Usuarios obtenidos con exito")
                         .data(users)
                         .build(),
-                HttpStatus.NOT_FOUND
+                HttpStatus.OK
         );
     }
 
@@ -93,9 +97,9 @@ public class AdminController {
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Usuarios obtenidos con exito")
-                        .data(userService.getUser(userId))
+                        .data(user)
                         .build(),
-                HttpStatus.NOT_FOUND
+                HttpStatus.OK
         );
     }
 
@@ -231,24 +235,44 @@ public class AdminController {
             );
         }
 
-        // llenar el dto de registro de casa en base a la data recibida
+        // PRUEBA ---------------------------------------------------
 
-        HomeRegisterDTO homeRegisterDTO = userHomeTools.createHomeRegisterDTO(info);
+        // Obtener el usuario administrador y cambiar su rol a "Encargado"
+        User adminUser = userService.getUser(info.getUserAdmin());
+        Role adminRole = roleService.getRoleByName("Encargado");
+        userService.updateRoleToUser(adminUser, adminRole);
 
+        // Crear una lista para almacenar los miembros de la casa
+        List<User> homeMembers = new ArrayList<>();
+
+        // Para cada ID de usuario en la lista de miembros de la casa
+        for(UUID memberId : info.getHomeMembers()) {
+            // Obtener el usuario y cambiar su rol a "Residente"
+            User memberUser = userService.getUser(memberId);
+            Role memberRole = roleService.getRoleByName("Residente");
+            userService.updateRoleToUser(memberUser, memberRole);
+
+            // Agregar el usuario a la lista de miembros de la casa
+            homeMembers.add(memberUser);
+        }
+
+        // Crear un nuevo HomeRegisterDTO y llenarlo con la información de HomeRegisterDataDTO y los usuarios obtenidos
+        HomeRegisterDTO homeRegisterDTO = new HomeRegisterDTO();
+        homeRegisterDTO.setHomeNumber(info.getHomeNumber());
+        homeRegisterDTO.setAddress(info.getAddress());
+        homeRegisterDTO.setMembersNumber(info.getMembersNumber());
+        homeRegisterDTO.setUserAdmin(adminUser);
+        homeRegisterDTO.setHomeMembers(homeMembers);
+
+        // Guardar la nueva casa
         homeService.saveHome(homeRegisterDTO);
 
-        // cambiar el rol del usuario a encargado y agregar la casa al usuario
-        // cambiar el rol de los usuarios que estan en la casa a residente y agregar casa a usuario
-        userHomeTools.updateRoleAndHome(homeRegisterDTO.getUserAdmin(),
-                roleService.getRoleByName("Encargado"),
-                roleService.getRoleByName("Residente"),
-                homeService.findHomeByAddressAndHomeNumber(homeRegisterDTO.getAddress(), homeRegisterDTO.getHomeNumber()),
-                homeRegisterDTO.getHomeMembers());
-
+        // TERMINA PRUEBA -------------------------------------------
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Casa registrada con exito")
+                        .data(homeRegisterDTO)
                         .build(),
                 HttpStatus.CREATED
         );
@@ -268,35 +292,50 @@ public class AdminController {
             );
         }
 
-        // cambiar el rol de los usuarios de la casa antiguos
-        userHomeTools.updateRoleAndHome(home.getHomeOwnerId(),
-                roleService.getRoleByName("Visitante"),
-                roleService.getRoleByName("Visitante"),
-                null,
-                home.getHomeMemberId());
+        // PRUEBA ---------------------------------------------------
 
-        // llenar el dto de registro de casa en base a la data recibida
-        HomeRegisterDTO homeRegisterDTO = userHomeTools.createHomeRegisterDTO(info);
+        // primero elimino el rol de los usuarios de la casa actualmente
+        userService.updateRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Visitante"));
+        for(User member : home.getHomeMemberId()){
+            userService.updateRoleToUser(member, roleService.getRoleByName("Visitante"));
+        }
 
-        // guardo la casa actualizada
+        // Obtener el nuevo usuario administrador y cambiar su rol a "Encargado"
+        User adminUser = userService.getUser(info.getUserAdmin());
+        Role adminRole = roleService.getRoleByName("Encargado");
+        userService.updateRoleToUser(adminUser, adminRole);
+
+        // Crear una lista para almacenar los nuevos miembros de la casa
+        List<User> homeMembers = new ArrayList<>();
+
+        // Para cada ID de usuario en la lista de miembros de la casa
+        for(UUID memberId : info.getHomeMembers()) {
+            // Obtener el usuario y cambiar su rol a "Residente"
+            User memberUser = userService.getUser(memberId);
+            Role memberRole = roleService.getRoleByName("Residente");
+            userService.updateRoleToUser(memberUser, memberRole);
+
+            // Agregar el usuario a la lista de miembros de la casa
+            homeMembers.add(memberUser);
+        }
+
+        // Crear un nuevo HomeRegisterDTO y llenarlo con la información de HomeRegisterDataDTO y los usuarios obtenidos
+        HomeRegisterDTO homeRegisterDTO = new HomeRegisterDTO();
+        homeRegisterDTO.setHomeNumber(info.getHomeNumber());
+        homeRegisterDTO.setAddress(info.getAddress());
+        homeRegisterDTO.setMembersNumber(info.getMembersNumber());
+        homeRegisterDTO.setUserAdmin(adminUser);
+        homeRegisterDTO.setHomeMembers(homeMembers);
+
+        // Guardar la nueva casa
         homeService.updateHome(home, homeRegisterDTO);
 
-        // cambiar el rol del usuario a encargado y agregar la casa al usuario
-        // cambiar el rol de los usuarios que estan en la casa a residente y agregar casa a usuario
-        // TODO: revisar por que falla el obtener al user admin
-        /*
-        userHomeTools.updateRoleAndHome(homeRegisterDTO.getUserAdmin(),
-                roleService.getRoleByName("Encargado"),
-                roleService.getRoleByName("Residente"),
-                homeService.findHomeByAddressAndHomeNumber(homeRegisterDTO.getAddress(), homeRegisterDTO.getHomeNumber()),
-                homeRegisterDTO.getHomeMembers());
-
-        * */
+        // TERMINA PRUEBA -------------------------------------------
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Casa actualizada con exito")
-                        .data(homeRegisterDTO.getHomeMembers())
+                        .data(home.getHomeOwnerId())
                         .build(),
                 HttpStatus.OK
         );
