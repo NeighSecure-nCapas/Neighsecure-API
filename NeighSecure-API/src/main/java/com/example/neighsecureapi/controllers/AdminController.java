@@ -1,17 +1,18 @@
 package com.example.neighsecureapi.controllers;
 
 
+import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryBoardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.DashboardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.UserResponseDTO;
+import com.example.neighsecureapi.domain.entities.Entry;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.User;
+import com.example.neighsecureapi.repositories.EntryRepository;
 import com.example.neighsecureapi.repositories.HomeRepository;
-import com.example.neighsecureapi.services.HomeService;
-import com.example.neighsecureapi.services.RoleService;
-import com.example.neighsecureapi.services.UserService;
+import com.example.neighsecureapi.services.*;
 import com.example.neighsecureapi.utils.FilterUserTools;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,14 +29,18 @@ public class AdminController {
     private final HomeService homeService;
     private final FilterUserTools filterUserTools;
     private final RoleService roleService;
-    private final HomeRepository homeRepository;
+    private final EntryService entryService;
+    private final TerminalService terminalService;
+    private final PermissionService permissionService;
 
-    public AdminController(UserService userService, HomeService homeService, FilterUserTools filterUserTools, RoleService roleService, HomeRepository homeRepository) {
+    public AdminController(UserService userService, HomeService homeService, FilterUserTools filterUserTools, RoleService roleService, HomeRepository homeRepository, EntryRepository entryRepository, EntryService entryService, TerminalService terminalService, PermissionService permissionService) {
         this.userService = userService;
         this.homeService = homeService;
         this.filterUserTools = filterUserTools;
         this.roleService = roleService;
-        this.homeRepository = homeRepository;
+        this.entryService = entryService;
+        this.terminalService = terminalService;
+        this.permissionService = permissionService;
     }
 
     // USER SECTION --------------------------------------------------------------
@@ -210,7 +215,7 @@ public class AdminController {
     @PostMapping("/homes/register")
     public ResponseEntity<GeneralResponse> registerHome(@RequestBody HomeRegisterDTO info) {
 
-        Home home = homeRepository.findByAddressAndHomeNumber(info.getAddress(), info.getHomeNumber()).orElse(null);
+        Home home = homeService.findHomeByAddressAndHomeNumber(info.getAddress(), info.getHomeNumber());
 
         if(home != null) {
             return new ResponseEntity<>(
@@ -277,6 +282,91 @@ public class AdminController {
                         .build(),
                 HttpStatus.OK
         );
+    }
+
+    // ENTRY SECTION --------------------------------------------------------------
+    @GetMapping("/entries")
+    public ResponseEntity<GeneralResponse> getAllEntries() {
+
+        // se mapea la lista de entradas a un dto para no enviar la data sensible y dar formato
+
+        List<EntryBoardAdmDTO> entries = entryService.getAllEntries()
+                .stream().map(entry -> {
+                    EntryBoardAdmDTO entryBoardAdmDTO = new EntryBoardAdmDTO();
+                    entryBoardAdmDTO.setId(entry.getId());
+                    entryBoardAdmDTO.setDate(entry.getEntryDate());
+                    entryBoardAdmDTO.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+                    entryBoardAdmDTO.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+                    entryBoardAdmDTO.setEntryType(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
+                    return entryBoardAdmDTO;
+                }).toList();
+
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Entradas obtenidas con exito")
+                        .data(entries)
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @GetMapping("/entries/{entryId}")
+    public ResponseEntity<GeneralResponse> getEntry(@PathVariable UUID entryId) {
+
+            EntryBoardAdmDTO entryFormat = new EntryBoardAdmDTO();
+
+            Entry entry = entryService.getEntry(entryId);
+
+            if(entry == null) {
+                return new ResponseEntity<>(
+                        new GeneralResponse.Builder()
+                                .message("Entrada no encontrada")
+                                .build(),
+                        HttpStatus.NOT_FOUND
+                );
+            }
+
+            // se mapea la entrada a un dto para no enviar la data sensible y dar formato
+
+            entryFormat.setId(entry.getId());
+            entryFormat.setDate(entry.getEntryDate());
+            entryFormat.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+            entryFormat.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+            entryFormat.setEntryType(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
+
+
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Entrada obtenida con exito")
+                            .data(entryFormat)
+                            .build(),
+                    HttpStatus.OK
+            );
+    }
+
+    @DeleteMapping("/entries/delete/{entryId}")
+    public ResponseEntity<GeneralResponse> deleteEntry(@PathVariable UUID entryId){
+
+            Entry entry = entryService.getEntry(entryId);
+
+            if(entry == null) {
+                return new ResponseEntity<>(
+                        new GeneralResponse.Builder()
+                                .message("Entrada no encontrada")
+                                .build(),
+                        HttpStatus.NOT_FOUND
+                );
+            }
+
+            entryService.deleteEntry(entryId);
+
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Entrada eliminada con exito")
+                            .build(),
+                    HttpStatus.OK
+            );
     }
 
 }
