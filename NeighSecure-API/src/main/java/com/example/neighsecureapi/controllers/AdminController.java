@@ -1,10 +1,11 @@
 package com.example.neighsecureapi.controllers;
 
 
-import com.example.neighsecureapi.domain.dtos.HomeRegisterDataDTO;
+import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeFullDataDTO;
+import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDataDTO;
 import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryBoardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
-import com.example.neighsecureapi.domain.dtos.HomeRegisterDTO;
+import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.DashboardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.UserResponseDTO;
 import com.example.neighsecureapi.domain.entities.Entry;
@@ -213,10 +214,29 @@ public class AdminController {
     @GetMapping("/homes/{homeId}")
     public ResponseEntity<GeneralResponse> getHome(@PathVariable UUID homeId) {
 
+        Home home = homeService.getHome(homeId);
+
+        if(home == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Casa no encontrada")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        HomeFullDataDTO homeFullDataDTO = new HomeFullDataDTO();
+        homeFullDataDTO.setId(home.getId());
+        homeFullDataDTO.setHomeNumber(home.getHomeNumber());
+        homeFullDataDTO.setAddress(home.getAddress());
+        homeFullDataDTO.setMembersNumber(home.getMembersNumber());
+        homeFullDataDTO.setUserAdmin(home.getHomeOwnerId());
+        homeFullDataDTO.setHomeMembers(home.getHomeMemberId());
+
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Casa obtenida con exito")
-                        .data(homeService.getHome(homeId))
+                        .data(homeFullDataDTO)
                         .build(),
                 HttpStatus.OK
         );
@@ -273,7 +293,6 @@ public class AdminController {
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Casa registrada con exito")
-                        .data(homeRegisterDTO)
                         .build(),
                 HttpStatus.CREATED
         );
@@ -336,7 +355,6 @@ public class AdminController {
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Casa actualizada con exito")
-                        .data(home.getHomeOwnerId())
                         .build(),
                 HttpStatus.OK
         );

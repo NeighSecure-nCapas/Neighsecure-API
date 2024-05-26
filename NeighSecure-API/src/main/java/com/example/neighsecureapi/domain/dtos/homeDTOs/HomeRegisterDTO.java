@@ -1,14 +1,13 @@
-package com.example.neighsecureapi.domain.dtos;
+package com.example.neighsecureapi.domain.dtos.homeDTOs;
 
 import com.example.neighsecureapi.domain.entities.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
-public class HomeRegisterDataDTO {
+public class HomeRegisterDTO {
     @NotBlank
     private Integer homeNumber;
 
@@ -18,7 +17,9 @@ public class HomeRegisterDataDTO {
     @NotBlank
     private Integer membersNumber;
 
-    private UUID userAdmin;
+    @NotBlank
+    private User userAdmin;
 
-    private List<UUID> homeMembers;
+    @NotBlank
+    private List<User> homeMembers;
 }

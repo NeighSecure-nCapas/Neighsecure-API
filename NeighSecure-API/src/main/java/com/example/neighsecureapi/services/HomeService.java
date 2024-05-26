@@ -1,6 +1,6 @@
 package com.example.neighsecureapi.services;
 
-import com.example.neighsecureapi.domain.dtos.HomeRegisterDTO;
+import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.User;
 

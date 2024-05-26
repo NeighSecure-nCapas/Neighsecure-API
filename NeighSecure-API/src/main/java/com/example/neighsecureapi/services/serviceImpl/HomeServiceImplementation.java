@@ -1,12 +1,11 @@
 package com.example.neighsecureapi.services.serviceImpl;
 
-import com.example.neighsecureapi.domain.dtos.HomeRegisterDTO;
+import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.HomeRepository;
 import com.example.neighsecureapi.services.HomeService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
