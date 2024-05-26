@@ -178,6 +178,7 @@ public class AdminController {
 
         DashboardAdmDTO dashboard = new DashboardAdmDTO();
 
+        // TODO: AGREGAR LOS CAMPOS QUE FALTAN DE LA DATA DE LA VISTA
         // envia los usuarios para poder hacer las graficas
         dashboard.setUsers(userService.getAllUsers());
 

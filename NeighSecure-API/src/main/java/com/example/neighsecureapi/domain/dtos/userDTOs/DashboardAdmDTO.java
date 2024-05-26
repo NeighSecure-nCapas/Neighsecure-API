@@ -14,4 +14,6 @@ public class DashboardAdmDTO {
     int totalUsers;
     int totalHomes;
     List<User> users;
+
+    // TODO: AGREGAR LOS CAMPOS QUE FALTAN DE LA DATA DE LA VISTA
 }
