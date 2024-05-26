@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,9 +50,12 @@ public class HomeServiceImplementation implements HomeService {
     @Transactional(rollbackOn = Exception.class)
     public void updateHome(Home home, HomeRegisterDTO info) {
 
-        if(info.getHomeNumber() != null) home.setHomeNumber(info.getHomeNumber());
-        if(info.getAddress() != null) home.setAddress(info.getAddress());
-        if(info.getMembersNumber() != null) home.setMembersNumber(info.getMembersNumber());
+        home.setHomeNumber(info.getHomeNumber());
+        home.setAddress(info.getAddress());
+        home.setMembersNumber(info.getMembersNumber());
+
+        home.setHomeOwnerId(info.getUserAdmin());
+        home.setHomeMemberId(info.getHomeMembers());
 
         homeRepository.save(home);
 
@@ -74,6 +78,8 @@ public class HomeServiceImplementation implements HomeService {
 
         // agregar los miembros a la lista de miembros
         List<User> currentMembers = home.getHomeMemberId();
+
+        if(currentMembers == null) currentMembers = new ArrayList<>();
 
         // ya debe estar validado que cabe el nuevo miembro
         currentMembers.add(homeMember);

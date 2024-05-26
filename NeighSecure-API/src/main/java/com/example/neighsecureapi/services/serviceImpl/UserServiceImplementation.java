@@ -10,6 +10,7 @@ import com.example.neighsecureapi.services.UserService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,7 +79,10 @@ public class UserServiceImplementation implements UserService {
     public void updateRoleToUser(User user, Role role) {
 
         // setea el rol como una lista de un nuevo rol
-        user.setRolId(List.of(role));
+        user.setRolId(new ArrayList<>());
+
+        // agrega el elemento a la lista
+        user.getRolId().add(role);
         userRepository.save(user);
 
     }
@@ -99,6 +103,13 @@ public class UserServiceImplementation implements UserService {
     @Override
     public User findUserByEmailAndDui(String email, String dui) {
         return userRepository.findByEmailAndAndDui(email, dui).orElse(null);
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void updateHomeToUser(User user, Home home) {
+        user.setHomeId(home);
+        userRepository.save(user);
     }
 
 }

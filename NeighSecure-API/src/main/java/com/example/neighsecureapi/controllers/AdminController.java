@@ -1,6 +1,7 @@
 package com.example.neighsecureapi.controllers;
 
 
+import com.example.neighsecureapi.domain.dtos.HomeRegisterDataDTO;
 import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryBoardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.HomeRegisterDTO;
@@ -14,10 +15,12 @@ import com.example.neighsecureapi.repositories.EntryRepository;
 import com.example.neighsecureapi.repositories.HomeRepository;
 import com.example.neighsecureapi.services.*;
 import com.example.neighsecureapi.utils.FilterUserTools;
+import com.example.neighsecureapi.utils.UserHomeTools;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,8 +35,9 @@ public class AdminController {
     private final EntryService entryService;
     private final TerminalService terminalService;
     private final PermissionService permissionService;
+    private final UserHomeTools userHomeTools;
 
-    public AdminController(UserService userService, HomeService homeService, FilterUserTools filterUserTools, RoleService roleService, HomeRepository homeRepository, EntryRepository entryRepository, EntryService entryService, TerminalService terminalService, PermissionService permissionService) {
+    public AdminController(UserService userService, HomeService homeService, FilterUserTools filterUserTools, RoleService roleService, HomeRepository homeRepository, EntryRepository entryRepository, EntryService entryService, TerminalService terminalService, PermissionService permissionService, UserHomeTools userHomeTools) {
         this.userService = userService;
         this.homeService = homeService;
         this.filterUserTools = filterUserTools;
@@ -41,6 +45,7 @@ public class AdminController {
         this.entryService = entryService;
         this.terminalService = terminalService;
         this.permissionService = permissionService;
+        this.userHomeTools = userHomeTools;
     }
 
     // USER SECTION --------------------------------------------------------------
@@ -213,7 +218,7 @@ public class AdminController {
     }
 
     @PostMapping("/homes/register")
-    public ResponseEntity<GeneralResponse> registerHome(@RequestBody HomeRegisterDTO info) {
+    public ResponseEntity<GeneralResponse> registerHome(@RequestBody HomeRegisterDataDTO info) {
 
         Home home = homeService.findHomeByAddressAndHomeNumber(info.getAddress(), info.getHomeNumber());
 
@@ -226,7 +231,20 @@ public class AdminController {
             );
         }
 
-        homeService.saveHome(info);
+        // llenar el dto de registro de casa en base a la data recibida
+
+        HomeRegisterDTO homeRegisterDTO = userHomeTools.createHomeRegisterDTO(info);
+
+        homeService.saveHome(homeRegisterDTO);
+
+        // cambiar el rol del usuario a encargado y agregar la casa al usuario
+        // cambiar el rol de los usuarios que estan en la casa a residente y agregar casa a usuario
+        userHomeTools.updateRoleAndHome(homeRegisterDTO.getUserAdmin(),
+                roleService.getRoleByName("Encargado"),
+                roleService.getRoleByName("Residente"),
+                homeService.findHomeByAddressAndHomeNumber(homeRegisterDTO.getAddress(), homeRegisterDTO.getHomeNumber()),
+                homeRegisterDTO.getHomeMembers());
+
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
@@ -237,7 +255,7 @@ public class AdminController {
     }
 
     @PatchMapping("/homes/update/{homeId}")
-    public ResponseEntity<GeneralResponse> updateHome(@PathVariable UUID homeId, @RequestBody HomeRegisterDTO info) {
+    public ResponseEntity<GeneralResponse> updateHome(@PathVariable UUID homeId, @RequestBody HomeRegisterDataDTO info) {
 
         Home home = homeService.getHome(homeId);
 
@@ -250,11 +268,35 @@ public class AdminController {
             );
         }
 
-        homeService.updateHome(home, info);
+        // cambiar el rol de los usuarios de la casa antiguos
+        userHomeTools.updateRoleAndHome(home.getHomeOwnerId(),
+                roleService.getRoleByName("Visitante"),
+                roleService.getRoleByName("Visitante"),
+                null,
+                home.getHomeMemberId());
+
+        // llenar el dto de registro de casa en base a la data recibida
+        HomeRegisterDTO homeRegisterDTO = userHomeTools.createHomeRegisterDTO(info);
+
+        // guardo la casa actualizada
+        homeService.updateHome(home, homeRegisterDTO);
+
+        // cambiar el rol del usuario a encargado y agregar la casa al usuario
+        // cambiar el rol de los usuarios que estan en la casa a residente y agregar casa a usuario
+        // TODO: revisar por que falla el obtener al user admin
+        /*
+        userHomeTools.updateRoleAndHome(homeRegisterDTO.getUserAdmin(),
+                roleService.getRoleByName("Encargado"),
+                roleService.getRoleByName("Residente"),
+                homeService.findHomeByAddressAndHomeNumber(homeRegisterDTO.getAddress(), homeRegisterDTO.getHomeNumber()),
+                homeRegisterDTO.getHomeMembers());
+
+        * */
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Casa actualizada con exito")
+                        .data(homeRegisterDTO.getHomeMembers())
                         .build(),
                 HttpStatus.OK
         );
