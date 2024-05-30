@@ -1,5 +1,6 @@
 package com.example.neighsecureapi.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class Role {
     @Column(name = "rol")
     private String rol;
 
+    @JsonBackReference
     @ManyToMany(mappedBy = "rolId")
-    @JsonIgnore
     private List<User> users;
 }

@@ -1,12 +1,12 @@
 package com.example.neighsecureapi.services.serviceImpl;
 
-import com.example.neighsecureapi.domain.dtos.EntryRegisterDTO;
+import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryRegisterDTO;
 import com.example.neighsecureapi.domain.entities.Entry;
 import com.example.neighsecureapi.domain.entities.Permission;
 import com.example.neighsecureapi.domain.entities.Terminal;
 import com.example.neighsecureapi.repositories.EntryRepository;
 import com.example.neighsecureapi.services.EntryService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,6 +22,7 @@ public class EntryServiceImplementation implements EntryService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void saveEntry(EntryRegisterDTO info, Terminal terminal, Permission permission) {
         Entry entry = new Entry();
 
@@ -35,6 +36,7 @@ public class EntryServiceImplementation implements EntryService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void deleteEntry(UUID entryId) {
         entryRepository.deleteById(entryId);
     }

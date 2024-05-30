@@ -1,6 +1,6 @@
 package com.example.neighsecureapi.services;
 
-import com.example.neighsecureapi.domain.dtos.RegisterUserDTO;
+import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterUserDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.User;
@@ -12,7 +12,7 @@ public interface UserService {
 
     // CRUD IMPLEMENTATION FOR USER ENTITY
     //TODO: implementar login
-    public void saveUser(RegisterUserDTO info, Home casa);
+    public void saveUser(RegisterUserDTO info, Role role);
     public void deleteUser(UUID userId);
 
     public void updateUser(String username, String password);
@@ -27,6 +27,9 @@ public interface UserService {
     public void addRoleToUser(User user, Role role);
     public void updateRoleToUser(User user, Role role);
     public User findUserByEmail(String email);
+    //public void addHomeToUser(User user, Home home);
+    public User findUserByEmailAndDui(String email, String dui);
+    //public void updateHomeToUser(User user, Home home);
 
     // Integer getUsersNumberByRole(String date, String roleId);
     // public void removeRoleFromUser(String userId, String roleId);

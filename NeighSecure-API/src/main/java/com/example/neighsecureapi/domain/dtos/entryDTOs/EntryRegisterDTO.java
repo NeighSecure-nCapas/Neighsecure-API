@@ -1,4 +1,4 @@
-package com.example.neighsecureapi.domain.dtos;
+package com.example.neighsecureapi.domain.dtos.entryDTOs;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

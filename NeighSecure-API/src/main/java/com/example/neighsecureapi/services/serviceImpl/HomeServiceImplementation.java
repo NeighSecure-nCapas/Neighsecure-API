@@ -1,13 +1,14 @@
 package com.example.neighsecureapi.services.serviceImpl;
 
-import com.example.neighsecureapi.domain.dtos.HomeRegisterDTO;
+import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.HomeRepository;
 import com.example.neighsecureapi.services.HomeService;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,56 +22,68 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
-    public void saveHome(HomeRegisterDTO info, User userAdmin, List<User> homeMembers) {
+    @Transactional(rollbackOn = Exception.class)
+    public void saveHome(HomeRegisterDTO info) {
         Home home = new Home();
 
         home.setHomeNumber(info.getHomeNumber());
         home.setAddress(info.getAddress());
-        home.setHomeOwnerId(userAdmin);
+        home.setHomeOwnerId(info.getUserAdmin());
         home.setStatus(true);
-        home.setHomeMemberId(homeMembers);
+        home.setHomeMemberId(info.getHomeMembers());
         home.setMembersNumber(info.getMembersNumber());
 
         homeRepository.save(home);
     }
 
     @Override
-    public void deleteHome(UUID homeId) {
-        Home home = homeRepository.findById(homeId).orElse(null);
+    @Transactional(rollbackOn = Exception.class)
+    public void deleteHome(Home home) {
 
-        if (home != null) {
-            home.setStatus(false);
-            homeRepository.save(home);
-        }
-    }
-
-    @Override
-    public void updateHome(Home home, HomeRegisterDTO info) {
-
-        if(info.getHomeNumber() != null) home.setHomeNumber(info.getHomeNumber());
-        if(info.getAddress() != null) home.setAddress(info.getAddress());
-        if(info.getMembersNumber() != null) home.setMembersNumber(info.getMembersNumber());
-
+        home.setStatus(false);
         homeRepository.save(home);
 
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void updateHome(Home home, HomeRegisterDTO info) {
+
+        home.setHomeNumber(info.getHomeNumber());
+        home.setAddress(info.getAddress());
+        home.setMembersNumber(info.getMembersNumber());
+
+        home.setHomeOwnerId(info.getUserAdmin());
+        home.setHomeMemberId(info.getHomeMembers());
+
+        //homeRepository.save(home);
+
+    }
+
+    @Override
     public Home getHome(UUID homeId) {
-        return homeRepository.findById(homeId).orElse(null);
+        return homeRepository.findByStatusIsTrueAndId(homeId).orElse(null);
     }
 
     @Override
     public List<Home> getAllHomes() {
         // TODO: implementar paginacion
-        return homeRepository.findAllByStatusIsTrue();
+        return homeRepository.findAllByStatusIsTrue().orElse(null);
     }
 
     @Override
+    public Home findHomeByUser(User user) {
+        return homeRepository.findByHomeOwnerIdOrHomeMemberIdAndStatusIsTrue(user, user).orElse(null);
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
     public void addHomeMembers(Home home, User homeMember) {
 
         // agregar los miembros a la lista de miembros
         List<User> currentMembers = home.getHomeMemberId();
+
+        if(currentMembers == null) currentMembers = new ArrayList<>();
 
         // ya debe estar validado que cabe el nuevo miembro
         currentMembers.add(homeMember);
@@ -80,6 +93,7 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void removeHomeMembers(Home home, User homeMemberDel) {
 
         // Debe estar validado que el miembro a eliminar exista y sea parte de la lista
@@ -90,6 +104,7 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void updateHomeAdmin(Home home, User homeAdmin) {
 
         home.setHomeOwnerId(homeAdmin);
@@ -98,8 +113,14 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void removeHomeAdmin(String homeName, String homeAddress, String homeAdmins) {
 
+    }
+
+    @Override
+    public Home findHomeByAddressAndHomeNumber(String address, Integer homeNumber) {
+        return homeRepository.findByAddressAndHomeNumber(address, homeNumber).orElse(null);
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.example.neighsecureapi.domain.entities.Permission;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.PermissionRepository;
 import com.example.neighsecureapi.services.PermissionService;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class PermissionServiceImplementation implements PermissionService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void savePermission(PermissionDTO info, Key key, Home casa, User user) {
         Permission permission = new Permission();
 
@@ -42,6 +44,7 @@ public class PermissionServiceImplementation implements PermissionService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void deletePermission(UUID permissionId) {
         permissionRepository.deleteById(permissionId);
     }
@@ -57,6 +60,7 @@ public class PermissionServiceImplementation implements PermissionService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void changePermissionValidationStatus(Permission permission) {
         permission.setValid(false);
         permissionRepository.save(permission);
@@ -64,12 +68,14 @@ public class PermissionServiceImplementation implements PermissionService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void changePermissionPendingStatus(Permission permission) {
         permission.setStatus(true);
         permissionRepository.save(permission);
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public boolean validatePermission(Permission permission, Key key) {
         // validar a base de comparacion de parametros
         /*FUNCIONAMIENTO DE LA VALIDACION DE PERMISOS, PROCESO PARA LLEGAR AQUI

@@ -4,6 +4,7 @@ import com.example.neighsecureapi.domain.dtos.KeyUpdateDTO;
 import com.example.neighsecureapi.domain.entities.Key;
 import com.example.neighsecureapi.repositories.KeyRepository;
 import com.example.neighsecureapi.services.KeyService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ public class KeyServiceImplementation implements KeyService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void saveKey() {
         // esta vacio ya que es la primera generacion de la llave, se inicia con valores null
         // quiza no sea ni necesaria la funcion, directamente se crea una llave en el controller
@@ -32,6 +34,7 @@ public class KeyServiceImplementation implements KeyService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void updateKey(Key key, KeyUpdateDTO info) {
         key.setGenerationDate(info.getGenerationDate());
         key.setGenerationTime(info.getGenerationTime());
