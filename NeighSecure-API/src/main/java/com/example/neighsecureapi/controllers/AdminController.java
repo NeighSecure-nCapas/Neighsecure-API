@@ -28,6 +28,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/neighSecure/admin")
+@CrossOrigin
 @Slf4j
 public class AdminController {
 

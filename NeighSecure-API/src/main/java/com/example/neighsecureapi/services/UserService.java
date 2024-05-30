@@ -3,6 +3,7 @@ package com.example.neighsecureapi.services;
 import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterUserDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
+import com.example.neighsecureapi.domain.entities.Token;
 import com.example.neighsecureapi.domain.entities.User;
 
 import java.util.List;
@@ -29,6 +30,7 @@ public interface UserService {
     public User findUserByEmail(String email);
     //public void addHomeToUser(User user, Home home);
     public User findUserByEmailAndDui(String email, String dui);
+    public User findUserByName(String name);
     //public void updateHomeToUser(User user, Home home);
 
     // Integer getUsersNumberByRole(String date, String roleId);
@@ -38,5 +40,14 @@ public interface UserService {
     // obtener el numero de usuarios por rol
     // public Integer getUsersNumberByRole(String date, String roleId);
 
+    // jwt ------------------------------------------------
+
+    //Token management
+    Token registerToken(User user) throws Exception;
+    Boolean isTokenValid(User user, String token);
+    void cleanTokens(User user) throws Exception;
+
+    //Find User authenticated
+    User findUserAuthenticated();
 
 }
