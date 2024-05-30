@@ -56,7 +56,7 @@ public class User implements UserDetails {
     private String dui;
 
     @Column(name = "estadoUser")
-    private boolean status;
+    private Boolean active;
 
     @JsonManagedReference
     @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
@@ -65,8 +65,8 @@ public class User implements UserDetails {
 
     // jwt things
     // TODO: ver si hay q cambiar todas las cuestiones afines a la variable status
-    @Column(name = "active", insertable = false)
-    private Boolean active;
+    //@Column(name = "active", insertable = false)
+    //private Boolean active;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore

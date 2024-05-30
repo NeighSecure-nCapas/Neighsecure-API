@@ -8,8 +8,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
-    Optional<User> findByEmail(String email);
-    List<User> findAllByStatusTrue();
-    Optional<User> findByEmailAndAndDui(String email, String dui);
-    Optional<User> findUserByNameAndStatusIsTrue(String name);
+    Optional<User> findByEmailAndActiveIsTrue(String email);
+    List<User> findAllByActiveIsTrue();
+    Optional<User> findByEmailAndDui(String email, String dui);
+    Optional<User> findUserByNameAndActiveIsTrue(String name);
+    Optional<User> findByEmailOrDuiOrNameAndActiveIsTrue(String email, String dui, String name);
 }

@@ -96,6 +96,8 @@ public class AdminController {
             );
         }
 
+        // TODO: presentationDTO
+
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Usuarios obtenidos con exito")
@@ -163,6 +165,8 @@ public class AdminController {
                     HttpStatus.NOT_FOUND
             );
         }
+
+        // TODO: presentationDTO
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()

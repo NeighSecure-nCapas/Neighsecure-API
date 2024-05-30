@@ -2,7 +2,6 @@ package com.example.neighsecureapi.services.serviceImpl;
 
 
 import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterUserDTO;
-import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.Token;
 import com.example.neighsecureapi.domain.entities.User;
@@ -42,7 +41,7 @@ public class UserServiceImplementation implements UserService {
         //user.setHomeId(null);
         user.setPhone(info.getPhone());
         user.setRolId(List.of(rol));
-        user.setStatus(true);
+        user.setActive(true);
 
         userRepository.save(user);
     }
@@ -54,7 +53,7 @@ public class UserServiceImplementation implements UserService {
         User user = userRepository.findById(userId).orElse(null);
 
         if (user != null) {
-            user.setStatus(false);
+            user.setActive(false);
             userRepository.save(user);
         }
     }
@@ -72,7 +71,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public List<User> getAllUsers() {
         // TODO: implementar paginacion
-        return userRepository.findAllByStatusTrue();
+        return userRepository.findAllByActiveIsTrue();
     }
 
     @Override
@@ -98,7 +97,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public User findUserByEmail(String email) {
 
-        return userRepository.findByEmail(email).orElse(null);
+        return userRepository.findByEmailAndActiveIsTrue(email).orElse(null);
     }
 
     /*
@@ -112,12 +111,17 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public User findUserByEmailAndDui(String email, String dui) {
-        return userRepository.findByEmailAndAndDui(email, dui).orElse(null);
+        return userRepository.findByEmailAndDui(email, dui).orElse(null);
     }
 
     @Override
     public User findUserByName(String name) {
-        return userRepository.findUserByNameAndStatusIsTrue(name).orElse(null);
+        return userRepository.findUserByNameAndActiveIsTrue(name).orElse(null);
+    }
+
+    @Override
+    public User findByIdentifier(String identifier) {
+        return userRepository.findByEmailOrDuiOrNameAndActiveIsTrue(identifier, identifier, identifier).orElse(null);
     }
 
     // TOKEN -----------------------------------------------------------------------
@@ -172,7 +176,7 @@ public class UserServiceImplementation implements UserService {
                 .getAuthentication()
                 .getName();
 
-        return userRepository.findUserByNameAndStatusIsTrue(username).orElse(null);
+        return userRepository.findUserByNameAndActiveIsTrue(username).orElse(null);
     }
 
     /*
