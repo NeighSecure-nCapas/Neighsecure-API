@@ -149,7 +149,7 @@ public class AdminController {
         );
     }
 
-    @GetMapping("/users/dui_email/{dui}/{email}")
+    @GetMapping("/users/{dui}/{email}")
     public ResponseEntity<GeneralResponse> getUsersByDuiOrEmail(@PathVariable String dui, @PathVariable String email) {
 
         User user = userService.findUserByEmailAndDui(email, dui);
