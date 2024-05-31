@@ -1,9 +1,9 @@
-package com.example.neighsecureapi.utils;
+package com.example.neighsecureapi.utils.auth;
 
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.services.UserService;
+import com.example.neighsecureapi.utils.jwt.JWTTokenFilter;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;

@@ -1,4 +1,4 @@
-package com.example.neighsecureapi.utils;
+package com.example.neighsecureapi.utils.jwt;
 
 import com.example.neighsecureapi.domain.entities.User;
 import io.jsonwebtoken.JwtParser;
