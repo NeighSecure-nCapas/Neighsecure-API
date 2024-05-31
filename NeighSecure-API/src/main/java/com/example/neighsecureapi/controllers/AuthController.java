@@ -2,6 +2,7 @@ package com.example.neighsecureapi.controllers;
 
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.TokenDTO;
+import com.example.neighsecureapi.domain.dtos.userDTOs.GoogleLoginDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.LoginUserDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterUserDTO;
 import com.example.neighsecureapi.domain.entities.Home;
@@ -86,6 +87,63 @@ public class AuthController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @PostMapping("/oauth2/google")
+    public ResponseEntity<GeneralResponse> loginGoogle(@RequestBody @Valid GoogleLoginDTO googleData) {
+
+        User user = userService.findUserByEmail(googleData.getEmail());
+
+        if(user == null) {
+            Role rol = roleService.getRoleByName("Visitante");
+
+            RegisterUserDTO registerUserDTO = new RegisterUserDTO();
+            registerUserDTO.setEmail(googleData.getEmail());
+            registerUserDTO.setName(googleData.getName());
+            registerUserDTO.setDui("");// se pide luego del login si es un register
+            registerUserDTO.setPhone("");// se pide luego del login si es un register
+
+            userService.saveUser(registerUserDTO, rol);
+
+            // despues de creado, se crea el token para inicar sesión y se retorna httpStatus created para identificar
+            User userRes = userService.findUserByEmail(googleData.getEmail());
+
+            try {
+                Token token = userService.registerToken(userRes);
+                return new ResponseEntity<>(
+                        new GeneralResponse.Builder()
+                                .message("Usuario registrado con exito, sesión iniciada")
+                                .data(new TokenDTO(token))
+                                .build(),
+                        HttpStatus.CREATED
+                );
+            } catch (Exception e) {
+                e.printStackTrace();
+                return new ResponseEntity<>(
+                        new GeneralResponse.Builder()
+                                .message("Usuario creado con éxito, error al registrar el token")
+                                .build(),
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+        }
+
+        // si ya existe el usuario hace login
+
+        try {
+            Token token = userService.registerToken(user);
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Usuario encontrado")
+                            .data(new TokenDTO(token))
+                            .build(),
+                    HttpStatus.OK
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
 }
