@@ -33,6 +33,7 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<GeneralResponse> register(@RequestBody @Valid RegisterUserDTO registerUserDTO) {
 
+        // TODO: implementar registro con google
         User user = userService.findUserByEmail(registerUserDTO.getEmail());
 
         if(user != null) {
