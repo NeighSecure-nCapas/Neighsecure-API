@@ -2,12 +2,15 @@ package com.example.neighsecureapi.services.serviceImpl;
 
 
 import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterUserDTO;
-import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
+import com.example.neighsecureapi.domain.entities.Token;
 import com.example.neighsecureapi.domain.entities.User;
+import com.example.neighsecureapi.repositories.TokenRepository;
 import com.example.neighsecureapi.repositories.UserRepository;
 import com.example.neighsecureapi.services.UserService;
+import com.example.neighsecureapi.utils.JWTTools;
 import jakarta.transaction.Transactional;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,9 +21,13 @@ import java.util.UUID;
 public class UserServiceImplementation implements UserService {
 
     private final UserRepository userRepository;
+    private final JWTTools jwtTools;
+    private final TokenRepository tokenRepository;
 
-    public UserServiceImplementation(UserRepository userRepository) {
+    public UserServiceImplementation(UserRepository userRepository, JWTTools jwtTools, TokenRepository tokenRepository) {
         this.userRepository = userRepository;
+        this.jwtTools = jwtTools;
+        this.tokenRepository = tokenRepository;
     }
 
     @Override
@@ -34,7 +41,7 @@ public class UserServiceImplementation implements UserService {
         //user.setHomeId(null);
         user.setPhone(info.getPhone());
         user.setRolId(List.of(rol));
-        user.setStatus(true);
+        user.setActive(true);
 
         userRepository.save(user);
     }
@@ -46,7 +53,7 @@ public class UserServiceImplementation implements UserService {
         User user = userRepository.findById(userId).orElse(null);
 
         if (user != null) {
-            user.setStatus(false);
+            user.setActive(false);
             userRepository.save(user);
         }
     }
@@ -64,7 +71,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public List<User> getAllUsers() {
         // TODO: implementar paginacion
-        return userRepository.findAllByStatusTrue();
+        return userRepository.findAllByActiveIsTrue();
     }
 
     @Override
@@ -90,7 +97,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public User findUserByEmail(String email) {
 
-        return userRepository.findByEmail(email).orElse(null);
+        return userRepository.findByEmailAndActiveIsTrue(email).orElse(null);
     }
 
     /*
@@ -104,7 +111,72 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     public User findUserByEmailAndDui(String email, String dui) {
-        return userRepository.findByEmailAndAndDui(email, dui).orElse(null);
+        return userRepository.findByEmailAndDui(email, dui).orElse(null);
+    }
+
+    @Override
+    public User findUserByName(String name) {
+        return userRepository.findUserByNameAndActiveIsTrue(name).orElse(null);
+    }
+
+    @Override
+    public User findByIdentifier(String identifier) {
+        return userRepository.findByEmailOrDuiOrNameAndActiveIsTrue(identifier, identifier, identifier).orElse(null);
+    }
+
+    // TOKEN -----------------------------------------------------------------------
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public Token registerToken(User user) throws Exception {
+        cleanTokens(user);
+
+        String tokenString = jwtTools.generateToken(user);
+        Token token = new Token(tokenString, user);
+
+        tokenRepository.save(token);
+
+        return token;
+    }
+
+    @Override
+    public Boolean isTokenValid(User user, String token) {
+        try {
+            cleanTokens(user);
+            List<Token> tokens = tokenRepository.findByUserAndActive(user, true);
+
+            tokens.stream()
+                    .filter(tk -> tk.getContent().equals(token))
+                    .findAny()
+                    .orElseThrow(() -> new Exception());
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void cleanTokens(User user) throws Exception {
+        List<Token> tokens = tokenRepository.findByUserAndActive(user, true);
+
+        tokens.forEach(token -> {
+            if(!jwtTools.verifyToken(token.getContent())) {
+                token.setActive(false);
+                tokenRepository.save(token);
+            }
+        });
+    }
+
+    @Override
+    public User findUserAuthenticated() {
+        String username = SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getName();
+
+        return userRepository.findUserByNameAndActiveIsTrue(username).orElse(null);
     }
 
     /*

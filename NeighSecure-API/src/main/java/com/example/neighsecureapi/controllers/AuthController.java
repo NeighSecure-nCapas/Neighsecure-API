@@ -1,9 +1,12 @@
 package com.example.neighsecureapi.controllers;
 
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
+import com.example.neighsecureapi.domain.dtos.TokenDTO;
+import com.example.neighsecureapi.domain.dtos.userDTOs.LoginUserDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterUserDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
+import com.example.neighsecureapi.domain.entities.Token;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.services.RoleService;
 import com.example.neighsecureapi.services.UserService;
@@ -51,6 +54,37 @@ public class AuthController {
                         .build(),
                 HttpStatus.CREATED
         );
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<GeneralResponse> login(@RequestBody @Valid LoginUserDTO loginUserDTO) {
+
+        // TODO: implementar login con google
+        User user = userService.findUserByEmail(loginUserDTO.getEmail());
+
+        if(user == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Usuario no encontrado")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+
+        try {
+            Token token = userService.registerToken(user);
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Usuario encontrado")
+                            .data(new TokenDTO(token))
+                            .build(),
+                    HttpStatus.OK
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 }

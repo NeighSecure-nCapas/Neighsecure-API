@@ -28,6 +28,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/neighSecure/admin")
+@CrossOrigin
 @Slf4j
 public class AdminController {
 
@@ -94,6 +95,8 @@ public class AdminController {
                     HttpStatus.NOT_FOUND
             );
         }
+
+        // TODO: presentationDTO
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
@@ -162,6 +165,8 @@ public class AdminController {
                     HttpStatus.NOT_FOUND
             );
         }
+
+        // TODO: presentationDTO
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
