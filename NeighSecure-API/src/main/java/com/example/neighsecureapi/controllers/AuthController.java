@@ -162,7 +162,7 @@ public class AuthController {
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String clientSecret;
 
-    @PostMapping("/oauth2/google")
+    @PostMapping("/oauth2/google/authtoken")
     public Mono<ResponseEntity<GeneralResponse>> authenticateWithGoogle(@RequestBody String idTokenString) {
         WebClient webClient = WebClient.create();
         String googleUri = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=" + idTokenString;
@@ -248,6 +248,43 @@ public class AuthController {
                 })
                 .onErrorResume(e -> {
                     // e.printStackTrace();
+                    return Mono.just(new ResponseEntity<>(
+                            new GeneralResponse.Builder()
+                                    .message("Error al autenticar con Google")
+                                    .build(),
+                            HttpStatus.INTERNAL_SERVER_ERROR
+                    ));
+                });
+    }
+
+    @PostMapping("/oauth2/google/code")
+    public Mono<ResponseEntity<GeneralResponse>> authenticateWithGoogleCode(@RequestBody String authorizationCode) {
+        WebClient webClient = WebClient.create();
+        String googleUri = "https://oauth2.googleapis.com/token";
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("code", authorizationCode);
+        formData.add("client_id", clientId);
+        formData.add("client_secret", clientSecret);
+        formData.add("redirect_uri", "http://localhost:8080/neighSecure/auth/oauth2/google/authtoken");
+        formData.add("grant_type", "authorization_code");
+
+        return webClient.post()
+                .uri(googleUri)
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData(formData))
+                .retrieve()
+                .bodyToMono(GoogleTokenInfo.class)
+                .flatMap(tokenInfo -> {
+                    // Aquí puedes usar el token de acceso para obtener información del perfil del usuario
+                    return Mono.just(new ResponseEntity<>(
+                            new GeneralResponse.Builder()
+                                    .message("Petición realizada con éxito")
+                                    .build(),
+                            HttpStatus.OK
+                    ));
+                })
+                .onErrorResume(e -> {
                     return Mono.just(new ResponseEntity<>(
                             new GeneralResponse.Builder()
                                     .message("Error al autenticar con Google")
