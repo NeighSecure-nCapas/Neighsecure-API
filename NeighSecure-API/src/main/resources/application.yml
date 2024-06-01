@@ -18,8 +18,13 @@ spring:
       hibernate:
         globally_quoted_identifiers: true
     show-sql: true
-  config:
-    additional-location: classpath:/application-secrets.yml
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: kk
+            client-secret: kk2
 
 jwt:
   secret: superUltraMegaDuperAlphaSecret360BrokenPassword
