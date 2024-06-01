@@ -18,6 +18,14 @@ spring:
       hibernate:
         globally_quoted_identifiers: true
     show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: google-client-id
+            client-secret: google-client-secret
+
 
 jwt:
   secret: superUltraMegaDuperAlphaSecret360BrokenPassword
