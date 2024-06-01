@@ -124,6 +124,13 @@ public class UserServiceImplementation implements UserService {
         return userRepository.findByEmailOrDuiOrNameAndActiveIsTrue(identifier, identifier, identifier).orElse(null);
     }
 
+    @Override
+    public void setDuiAndPhoneToUser(User user, String dui, String phone) {
+        user.setDui(dui);
+        user.setPhone(phone);
+        userRepository.save(user);
+    }
+
     // TOKEN -----------------------------------------------------------------------
 
     @Override

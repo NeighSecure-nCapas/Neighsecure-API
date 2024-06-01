@@ -32,6 +32,7 @@ public interface UserService {
     public User findUserByEmailAndDui(String email, String dui);
     public User findUserByName(String name);
     public User findByIdentifier(String identifier);
+    public void setDuiAndPhoneToUser(User user, String dui, String phone);
     //public void updateHomeToUser(User user, Home home);
 
     // Integer getUsersNumberByRole(String date, String roleId);
