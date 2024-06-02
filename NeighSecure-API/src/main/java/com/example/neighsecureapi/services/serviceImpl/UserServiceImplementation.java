@@ -8,7 +8,7 @@ import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.TokenRepository;
 import com.example.neighsecureapi.repositories.UserRepository;
 import com.example.neighsecureapi.services.UserService;
-import com.example.neighsecureapi.utils.JWTTools;
+import com.example.neighsecureapi.utils.jwt.JWTTools;
 import jakarta.transaction.Transactional;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -122,6 +122,13 @@ public class UserServiceImplementation implements UserService {
     @Override
     public User findByIdentifier(String identifier) {
         return userRepository.findByEmailOrDuiOrNameAndActiveIsTrue(identifier, identifier, identifier).orElse(null);
+    }
+
+    @Override
+    public void setDuiAndPhoneToUser(User user, String dui, String phone) {
+        user.setDui(dui);
+        user.setPhone(phone);
+        userRepository.save(user);
     }
 
     // TOKEN -----------------------------------------------------------------------
