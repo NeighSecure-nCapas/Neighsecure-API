@@ -69,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
         log.info("Fetching user info... {}", accessToken);
 
         WebClient webClient = WebClient.create();
-        String googleUri = "https://www.googleapis.com/oauth2/v3/tokeninfo?access_token=" + accessToken;
+        String googleUri = "https://www.googleapis.com/oauth2/v3/userinfo?access_token=" + accessToken;
 
         return webClient.get()
                 .uri(googleUri)
