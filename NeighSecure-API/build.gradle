@@ -44,9 +44,7 @@ dependencies {
 
     // google
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
-    // doten java for env
-    implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+    implementation 'io.netty:netty-resolver-dns-native-macos:4.1.72.Final:osx-aarch_64'
 }
 
 tasks.named('test') {

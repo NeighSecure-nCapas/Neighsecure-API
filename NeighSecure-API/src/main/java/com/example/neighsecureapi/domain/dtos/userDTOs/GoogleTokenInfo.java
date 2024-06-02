@@ -4,9 +4,8 @@ import lombok.Data;
 
 @Data
 public class GoogleTokenInfo {
-    private String email;
-    private String name;
-    private String picture;
-    private boolean email_verified;
-
+    private String access_token;
+    private Number expires_in;
+    private String scope;
+    private String refresh_token;
 }
