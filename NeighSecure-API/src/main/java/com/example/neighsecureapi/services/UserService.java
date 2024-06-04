@@ -27,6 +27,7 @@ public interface UserService {
     // ADDITIONAL METHODS
     public void addRoleToUser(User user, Role role);
     public void updateRoleToUser(User user, Role role);
+    public  void deleteRoleToUser(User user, Role role);
     public User findUserByEmail(String email);
     //public void addHomeToUser(User user, Home home);
     public User findUserByEmailAndDui(String email, String dui);

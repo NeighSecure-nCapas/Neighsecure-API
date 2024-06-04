@@ -27,5 +27,6 @@ public class Role {
 
     @JsonBackReference
     @ManyToMany(mappedBy = "rolId")
+    @JsonIgnore
     private List<User> users;
 }

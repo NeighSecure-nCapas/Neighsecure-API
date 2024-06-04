@@ -263,10 +263,12 @@ public class AdminController {
 
         // PRUEBA ---------------------------------------------------
 
-        // Obtener el usuario administrador y cambiar su rol a "Encargado"
+        // Obtener el usuario administrador y cambiar su rol a "Encargado" y "Residente
         User adminUser = userService.getUser(info.getUserAdmin());
         Role adminRole = roleService.getRoleByName("Encargado");
         userService.updateRoleToUser(adminUser, adminRole);
+        // Agregar el segundo rol al encargado
+        userService.addRoleToUser(adminUser, roleService.getRoleByName("Residente"));
 
         // Crear una lista para almacenar los miembros de la casa
         List<User> homeMembers = new ArrayList<>();
@@ -472,6 +474,31 @@ public class AdminController {
                             .build(),
                     HttpStatus.OK
             );
+    }
+
+    //------GUARD SECTTION-------------------------------------------------------------
+    @PostMapping("/addGuard/{userId}")
+    public ResponseEntity<GeneralResponse> addGuard(@PathVariable UUID userId){
+
+        User user = userService.getUser(userId);
+
+        if(user == null){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("User not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+        Role rol = roleService.getRoleByName("Vigilante");
+        userService.updateRoleToUser(user, rol);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Guard added")
+                        .build(),
+                HttpStatus.OK
+        );
     }
 
 }
