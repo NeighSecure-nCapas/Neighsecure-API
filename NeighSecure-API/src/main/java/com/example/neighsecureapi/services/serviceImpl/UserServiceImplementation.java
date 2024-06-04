@@ -95,6 +95,7 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
     public void deleteRoleToUser(User user, Role role) {
         List<Role> roles = user.getRolId();
 
