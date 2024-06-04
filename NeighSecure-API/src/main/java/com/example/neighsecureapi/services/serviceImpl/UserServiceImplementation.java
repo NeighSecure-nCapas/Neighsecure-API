@@ -95,6 +95,16 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    @Transactional(rollbackOn = Exception.class)
+    public void deleteRoleToUser(User user, Role role) {
+        List<Role> roles = user.getRolId();
+
+        roles.removeIf(r -> r.getRolId().equals(role.getRolId()));
+
+        userRepository.save(user);
+    }
+
+    @Override
     public User findUserByEmail(String email) {
 
         return userRepository.findByEmailAndActiveIsTrue(email).orElse(null);

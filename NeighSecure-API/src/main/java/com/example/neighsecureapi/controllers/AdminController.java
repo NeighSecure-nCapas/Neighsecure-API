@@ -7,6 +7,7 @@ import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryBoardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.DashboardAdmDTO;
+import com.example.neighsecureapi.domain.dtos.userDTOs.RoleUpdateDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.UserResponseDTO;
 import com.example.neighsecureapi.domain.entities.Entry;
 import com.example.neighsecureapi.domain.entities.Home;
@@ -263,10 +264,12 @@ public class AdminController {
 
         // PRUEBA ---------------------------------------------------
 
-        // Obtener el usuario administrador y cambiar su rol a "Encargado"
+        // Obtener el usuario administrador y cambiar su rol a "Encargado" y "Residente
         User adminUser = userService.getUser(info.getUserAdmin());
         Role adminRole = roleService.getRoleByName("Encargado");
-        userService.updateRoleToUser(adminUser, adminRole);
+        userService.addRoleToUser(adminUser, adminRole);
+        // Agregar el segundo rol al encargado
+        userService.addRoleToUser(adminUser, roleService.getRoleByName("Residente"));
 
         // Crear una lista para almacenar los miembros de la casa
         List<User> homeMembers = new ArrayList<>();
@@ -276,7 +279,7 @@ public class AdminController {
             // Obtener el usuario y cambiar su rol a "Residente"
             User memberUser = userService.getUser(memberId);
             Role memberRole = roleService.getRoleByName("Residente");
-            userService.updateRoleToUser(memberUser, memberRole);
+            userService.addRoleToUser(memberUser, memberRole);
 
             // Agregar el usuario a la lista de miembros de la casa
             homeMembers.add(memberUser);
@@ -320,15 +323,17 @@ public class AdminController {
         // PRUEBA ---------------------------------------------------
 
         // primero elimino el rol de los usuarios de la casa actualmente
-        userService.updateRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Visitante"));
+        userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Residente"));
+        userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Encargado"));
         for(User member : home.getHomeMemberId()){
-            userService.updateRoleToUser(member, roleService.getRoleByName("Visitante"));
+            userService.deleteRoleToUser(member, roleService.getRoleByName("Residente"));
         }
 
         // Obtener el nuevo usuario administrador y cambiar su rol a "Encargado"
         User adminUser = userService.getUser(info.getUserAdmin());
         Role adminRole = roleService.getRoleByName("Encargado");
-        userService.updateRoleToUser(adminUser, adminRole);
+        userService.addRoleToUser(adminUser, adminRole);
+        userService.addRoleToUser(adminUser, roleService.getRoleByName("Residente"));
 
         // Crear una lista para almacenar los nuevos miembros de la casa
         List<User> homeMembers = new ArrayList<>();
@@ -338,7 +343,7 @@ public class AdminController {
             // Obtener el usuario y cambiar su rol a "Residente"
             User memberUser = userService.getUser(memberId);
             Role memberRole = roleService.getRoleByName("Residente");
-            userService.updateRoleToUser(memberUser, memberRole);
+            userService.addRoleToUser(memberUser, memberRole);
 
             // Agregar el usuario a la lista de miembros de la casa
             homeMembers.add(memberUser);
@@ -472,6 +477,67 @@ public class AdminController {
                             .build(),
                     HttpStatus.OK
             );
+    }
+
+    //------GUARD SECTTION-------------------------------------------------------------
+    @PostMapping("/addGuard/{userId}")
+    public ResponseEntity<GeneralResponse> addGuard(@PathVariable UUID userId){
+
+        User user = userService.getUser(userId);
+
+        if(user == null){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("User not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+        Role rol = roleService.getRoleByName("Vigilante");
+        userService.addRoleToUser(user, rol);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Guard added")
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PatchMapping("/deleteRole")
+    public ResponseEntity<GeneralResponse> deleteRole(@RequestBody RoleUpdateDTO data){
+
+        User user = userService.getUser(data.getUserId());
+
+        if(user == null){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("User not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        // debe recibir el rol con el nombre correcto
+        Role rolDel = roleService.getRoleByName(data.getRole());
+
+        if(rolDel == null){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Role not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        userService.deleteRoleToUser(user, rolDel);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("User role deleted")
+                        .build(),
+                HttpStatus.OK
+        );
     }
 
 }
