@@ -25,6 +25,12 @@ public class KeyServiceImplementation implements KeyService {
     public void saveKey() {
         // esta vacio ya que es la primera generacion de la llave, se inicia con valores null
         // quiza no sea ni necesaria la funcion, directamente se crea una llave en el controller
+        Key key = new Key();
+        key.setGenerationDate(null);
+        key.setGenerationTime(null);
+        key.setGenerationDay(null);
+
+        keyRepository.save(key);
 
     }
 
