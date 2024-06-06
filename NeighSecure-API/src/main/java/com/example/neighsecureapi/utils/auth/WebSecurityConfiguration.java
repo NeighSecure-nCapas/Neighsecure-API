@@ -8,9 +8,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -19,11 +22,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration {
 
     private final UserService userService;
 
     private final JWTTokenFilter filter;
+
 
     public WebSecurityConfiguration(UserService userService, JWTTokenFilter filter) {
         this.userService = userService;
@@ -35,8 +40,7 @@ public class WebSecurityConfiguration {
         AuthenticationManagerBuilder managerBuilder
                 = http.getSharedObject(AuthenticationManagerBuilder.class);
 
-        managerBuilder
-                .userDetailsService(identifier -> {
+        managerBuilder.userDetailsService(identifier -> {
                     User user = userService.findUserByName(identifier);
 
                     if(user == null)
@@ -50,6 +54,7 @@ public class WebSecurityConfiguration {
 
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         //Http login and cors disabled
         http.httpBasic(withDefaults()).csrf(csrf -> csrf.disable());
 

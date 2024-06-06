@@ -31,6 +31,7 @@ public class JWTTools {
                 .compact();
     }
 
+    // TODO: CAMBIAR PARA QUE SE CREE EN BASE AL EMAIL
     public Boolean verifyToken(String token) {
         try {
             JwtParser parser = Jwts.parser()

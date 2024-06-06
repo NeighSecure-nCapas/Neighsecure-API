@@ -21,6 +21,7 @@ import com.example.neighsecureapi.utils.UserHomeTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ public class AdminController {
 
     // USER SECTION --------------------------------------------------------------
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/users")
     public ResponseEntity<GeneralResponse> getAllUsers() {
 
@@ -83,6 +85,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/users/{userId}")
     public ResponseEntity<GeneralResponse> getUser(@PathVariable UUID userId) {
 
@@ -108,6 +111,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @PatchMapping("/users/delete/{userId}")
     public ResponseEntity<GeneralResponse> deleteUser(@PathVariable UUID userId) {
 
@@ -133,6 +137,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/users/role/{role}")
     public ResponseEntity<GeneralResponse> getUsersByRole(@PathVariable String role) {
 
@@ -153,6 +158,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/users/{dui}/{email}")
     public ResponseEntity<GeneralResponse> getUsersByDuiOrEmail(@PathVariable String dui, @PathVariable String email) {
 
@@ -180,6 +186,7 @@ public class AdminController {
 
     // DASHBOARD SECTION --------------------------------------------------------------
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/dashboard")
     public ResponseEntity<GeneralResponse> getDashboard() {
 
@@ -205,6 +212,7 @@ public class AdminController {
 
     // HOME SECTION --------------------------------------------------------------
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/homes")
     public ResponseEntity<GeneralResponse> getAllHomes() {
 
@@ -217,6 +225,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/homes/{homeId}")
     public ResponseEntity<GeneralResponse> getHome(@PathVariable UUID homeId) {
 
@@ -248,6 +257,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @PostMapping("/homes/register")
     public ResponseEntity<GeneralResponse> registerHome(@RequestBody HomeRegisterDataDTO info) {
 
@@ -306,6 +316,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @PatchMapping("/homes/update/{homeId}")
     public ResponseEntity<GeneralResponse> updateHome(@PathVariable UUID homeId, @RequestBody HomeRegisterDataDTO info) {
 
@@ -370,6 +381,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @PatchMapping("/homes/delete/{homeId}")
     public ResponseEntity<GeneralResponse> deleteHome(@PathVariable UUID homeId) {
 
@@ -395,6 +407,7 @@ public class AdminController {
     }
 
     // ENTRY SECTION --------------------------------------------------------------
+    @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/entries")
     public ResponseEntity<GeneralResponse> getAllEntries() {
 
@@ -421,6 +434,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/entries/{entryId}")
     public ResponseEntity<GeneralResponse> getEntry(@PathVariable UUID entryId) {
 
@@ -455,6 +469,7 @@ public class AdminController {
             );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @DeleteMapping("/entries/delete/{entryId}")
     public ResponseEntity<GeneralResponse> deleteEntry(@PathVariable UUID entryId){
 
@@ -480,6 +495,7 @@ public class AdminController {
     }
 
     //------GUARD SECTTION-------------------------------------------------------------
+    @PreAuthorize("hasAuthority('Administrador')")
     @PostMapping("/addGuard/{userId}")
     public ResponseEntity<GeneralResponse> addGuard(@PathVariable UUID userId){
 
@@ -504,6 +520,7 @@ public class AdminController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Administrador')")
     @PatchMapping("/deleteRole")
     public ResponseEntity<GeneralResponse> deleteRole(@RequestBody RoleUpdateDTO data){
 
