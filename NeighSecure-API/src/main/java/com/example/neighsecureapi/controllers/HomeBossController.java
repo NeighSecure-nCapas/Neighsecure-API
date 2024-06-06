@@ -4,8 +4,10 @@ package com.example.neighsecureapi.controllers;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.homeDTOs.AddMemberDTO;
 import com.example.neighsecureapi.domain.entities.Home;
+import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.services.HomeService;
+import com.example.neighsecureapi.services.RoleService;
 import com.example.neighsecureapi.services.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +26,12 @@ public class HomeBossController {
 
     private final HomeService homeService;
     private final UserService userService;
+    private final RoleService roleService;
 
-    public HomeBossController(HomeService homeService, UserService userService) {
+    public HomeBossController(HomeService homeService, UserService userService, RoleService roleService) {
         this.homeService = homeService;
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @PreAuthorize("hasAuthority('Encargado')")
@@ -70,6 +74,10 @@ public class HomeBossController {
 
         homeService.addHomeMembers(home, user);
 
+        // agregar el rol al usuario
+        Role rol = roleService.getRoleByName("Residente");
+        userService.addRoleToUser(user, rol);
+
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Member added successfully")
@@ -78,5 +86,45 @@ public class HomeBossController {
         );
     }
 
+    @PreAuthorize("hasAuthority('Encargado')")
+    @PatchMapping("/removeMember")
+    public ResponseEntity<GeneralResponse> removeMember(@RequestBody @Valid AddMemberDTO addMemberDTO) {
+
+        Home home = homeService.getHome(addMemberDTO.getHomeId());
+
+        if(home == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Home not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        // busco al usuario a eliminar de la casa
+        User user = userService.findUserByEmail(addMemberDTO.getUserEmail());
+
+        if(user == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("User not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        homeService.removeHomeMembers(home, user);
+
+        // quitar el rol al usuario
+        Role rol = roleService.getRoleByName("Residente");
+        userService.deleteRoleToUser(user, rol);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Member removed successfully")
+                        .build(),
+                HttpStatus.OK
+        );
+    }
 
 }
