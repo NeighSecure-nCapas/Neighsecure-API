@@ -7,9 +7,11 @@ import com.example.neighsecureapi.domain.entities.Permission;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.PermissionRepository;
 import com.example.neighsecureapi.services.PermissionService;
+import com.example.neighsecureapi.utils.ArrayManagementTools;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -18,9 +20,11 @@ import java.util.UUID;
 public class PermissionServiceImplementation implements PermissionService {
 
     private final PermissionRepository permissionRepository;
+    private final ArrayManagementTools arrayManagementTools;
 
-    public PermissionServiceImplementation(PermissionRepository permissionRepository) {
+    public PermissionServiceImplementation(PermissionRepository permissionRepository, ArrayManagementTools arrayManagementTools) {
         this.permissionRepository = permissionRepository;
+        this.arrayManagementTools = arrayManagementTools;
     }
 
     @Override
@@ -69,14 +73,14 @@ public class PermissionServiceImplementation implements PermissionService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void changePermissionPendingStatus(Permission permission) {
-        permission.setStatus(true);
+    public void changePermissionPendingStatus(Permission permission, boolean status) {
+        permission.setStatus(status);
         permissionRepository.save(permission);
     }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public boolean validatePermission(Permission permission, Key key) {
+    public boolean validatePermission(Permission permission, Key key) {// valida para el status en permiso
         // validar a base de comparacion de parametros
         /*FUNCIONAMIENTO DE LA VALIDACION DE PERMISOS, PROCESO PARA LLEGAR AQUI
         1. El usuario solicita un permiso
@@ -95,6 +99,35 @@ public class PermissionServiceImplementation implements PermissionService {
         10. si es valido, se permite el acceso y se actualiza el estado del permiso
         * */
         // TODO: validacion de parametros :b
+
+        /*
+        1. cuando el visitante da click en generar qr, se busca la llave de ese permiso y se actualiza los campos
+        2. ya con los nuevos campos, se valida si la data de tiempo que esta en la llave esta dentro de los parametros del permiso
+        3. si es asi, se genera el qr mandando el uuid de la llave
+        4. si no, se actualiza el campo de status del permiso a false por q ya no es utilizable
+
+        CUANDO SE LEE EL QR
+        1. se busca el permiso con el id de la llave
+        2. se valida si la data de tiempo de la llave esta dentro de los parametros del permiso
+        3. si es asi, se permite el acceso y se actualiza el campo de status del permiso a false si se trata de entrada unica
+        3.1 si es un permiso de entrada multiple, se mantiene en true el status
+        * */
+
+        // VALIDAR  SI LA FECHA DE LA KEY ESTA DENTRO DE LAS FECHAS DEL PERMISO
+        if(key.getGenerationDate().after(permission.getStartDate()) && key.getGenerationDate().before(permission.getEndDate())) {
+            // VALIDAR SI LA HORA DE LA KEY ESTA DENTRO DE LAS HORAS DEL PERMISO
+            if (key.getGenerationTime().after(permission.getStartTime()) && key.getGenerationTime().before(permission.getEndTime())) {
+
+                // Debo obtener el arreglo de dias de la semana en base al string de dias en permiso
+                List<String> permissionDays = arrayManagementTools.convertStringToList(permission.getDays());
+
+                // VALIDAR SI EL DIA DE LA KEY ESTA DENTRO DE LOS DIAS DEL PERMISO
+                if (permissionDays.contains(key.getGenerationDay())) {
+
+                    return true;
+                }
+            }
+        }
 
         return false;
     }
