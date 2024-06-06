@@ -7,12 +7,16 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Data
@@ -41,6 +45,7 @@ public class User implements UserDetails {
     @JoinTable(name = "usuario_rol_id",
             joinColumns = @JoinColumn(name = "users_usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "rol_id_rol_id"))
+    @Fetch(FetchMode.JOIN)// esto es como hacer fetch en eager
     //@JsonIgnore
     private List<Role> rolId;
 
@@ -72,9 +77,12 @@ public class User implements UserDetails {
     @JsonIgnore
     private List<Token> tokens;
 
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return this.rolId.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getRol()))
+                .toList();
     }
 
     //getUsername is already overridden
@@ -107,7 +115,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return "";
+        return this.name;
     }
     // -------------------------------
 }
