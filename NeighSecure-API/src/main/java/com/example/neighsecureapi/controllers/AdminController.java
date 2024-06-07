@@ -225,7 +225,7 @@ public class AdminController {
         );
     }
 
-    @PreAuthorize("hasAuthority('Administrador')")
+    @PreAuthorize("hasAnyAuthority('Administrador')")
     @GetMapping("/homes/{homeId}")
     public ResponseEntity<GeneralResponse> getHome(@PathVariable UUID homeId) {
 
@@ -316,7 +316,7 @@ public class AdminController {
         );
     }
 
-    @PreAuthorize("hasAuthority('Administrador')")
+    @PreAuthorize("hasAnyAuthority('Administrador')")
     @PatchMapping("/homes/update/{homeId}")
     public ResponseEntity<GeneralResponse> updateHome(@PathVariable UUID homeId, @RequestBody HomeRegisterDataDTO info) {
 

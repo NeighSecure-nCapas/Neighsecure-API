@@ -12,8 +12,8 @@ import java.util.UUID;
 public interface PermissionService {
 
     // CRUD IMPLEMENTATION FOR PERMISSION ENTITY
-    public void savePermission(PermissionDTO info, Key llave, Home casa, User user); // hay q validar el rol q genera el permiso
-    public void deletePermission(UUID permissionId);
+    public void savePermission(PermissionDTO info, Key llave, Home casa, User user, User encargado); // hay q validar el rol q genera el permiso
+    public void deletePermission(Permission permissionId);
 
     // public void updatePermission(String permissionId);
     public Permission getPermission(UUID permissionId);
@@ -28,6 +28,7 @@ public interface PermissionService {
     // Obtener permisos por estado de pendiente o validado por el encargado
     // public List<Permission> getPermissionByPendingStatus(String permissionId);
     // public List<Permission> getPermissionsByUser(String permissionId, String userId);
+    public  List<Permission> getPermissionsByHome(Home homeId);
 
     // Cambiar estado de un permiso, si sigue siendo vigente para su uso
     public void changePermissionValidationStatus(Permission permissionId);
