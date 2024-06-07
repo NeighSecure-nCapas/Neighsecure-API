@@ -38,8 +38,8 @@ public class Permission {
     @Column(name = "horaFin")
     private Date endTime;
 
-    @Column(name = "estado")// aprobado true, pendiente false
-    private boolean status;
+    @Column(name = "estado")// aprobado true, rechazado false, pendiente null
+    private Boolean status;
 
     @Column(name = "vigente")// aun es utilizable true, ya no false
     private boolean valid;
@@ -61,8 +61,15 @@ public class Permission {
     private Home homeId;
 
     @JoinColumn(name = "usuarioId") // TODO: LLAVE FORANEA
-    @ManyToOne
-    private User userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User userId;// usuario al que pertenece el permiso
+
+    @JoinColumn(name = "usuarioAuth") // TODO: LLAVE FORANEA
+    @ManyToOne(fetch = FetchType.LAZY )
+    private User userAuth; // usuario que emitio el permiso
+
+    @Column(name = "activo")
+    private boolean active;
 
     @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
     @JsonIgnore

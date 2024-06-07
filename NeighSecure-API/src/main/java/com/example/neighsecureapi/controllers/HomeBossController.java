@@ -4,9 +4,11 @@ package com.example.neighsecureapi.controllers;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.homeDTOs.AddMemberDTO;
 import com.example.neighsecureapi.domain.entities.Home;
+import com.example.neighsecureapi.domain.entities.Permission;
 import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.services.HomeService;
+import com.example.neighsecureapi.services.PermissionService;
 import com.example.neighsecureapi.services.RoleService;
 import com.example.neighsecureapi.services.UserService;
 import jakarta.validation.Valid;
@@ -17,9 +19,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/homeboss")
+@RequestMapping("/neighSecure/homeboss")
 @CrossOrigin
 @Slf4j
 public class HomeBossController {
@@ -27,12 +30,16 @@ public class HomeBossController {
     private final HomeService homeService;
     private final UserService userService;
     private final RoleService roleService;
+    private final PermissionService permissionService;
 
-    public HomeBossController(HomeService homeService, UserService userService, RoleService roleService) {
+    public HomeBossController(HomeService homeService, UserService userService, RoleService roleService, PermissionService permissionService) {
         this.homeService = homeService;
         this.userService = userService;
         this.roleService = roleService;
+        this.permissionService = permissionService;
     }
+
+    // GESTION DE HOGAR------------------------------------------------------------------
 
     @PreAuthorize("hasAuthority('Encargado')")
     @PostMapping("/addMember")
@@ -122,6 +129,172 @@ public class HomeBossController {
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Member removed successfully")
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    // GESTION DE VISITAS------------------------------------------------------------------
+
+    @PreAuthorize("hasAuthority('Encargado')")
+    @GetMapping("/permissions/home/{homeId}")
+    public ResponseEntity<GeneralResponse> getAllPermissionsByHome(@PathVariable UUID homeId) {
+
+        Home home = homeService.getHome(homeId);
+
+        if(home == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Home not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        List<Permission> permissions = permissionService.getPermissionsByHome(home);
+        // TODO: validar si se debe retornar la lista de permisos entera o solo los que estan pendientes y aun son validos
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Permissions obtained successfully")
+                        .data(permissions)
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize("hasAuthority('Encargado')")
+    @GetMapping("permissions/{permissionId}")
+    public ResponseEntity<GeneralResponse> getPermission(@PathVariable UUID permissionId) {
+
+        Permission permission = permissionService.getPermission(permissionId);
+
+        if(permission == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        if(!permission.isActive()){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission is not active")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Permission obtained successfully")
+                        .data(permission)
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize("hasAuthority('Encargado')")
+    @PatchMapping("/permissions/approve/{permissionId}")
+    public ResponseEntity<GeneralResponse> aprovePermission(@PathVariable UUID permissionId) {
+
+        Permission permission = permissionService.getPermission(permissionId);
+
+        if(permission == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        if(!permission.isActive()){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission is not active")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // envio el permiso y cambio el estado a aprobado
+        permissionService.changePermissionPendingStatus(permission, true);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Permission approved successfully")
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize("hasAuthority('Encargado')")
+    @PatchMapping("/permissions/reject/{permissionId}")
+    public ResponseEntity<GeneralResponse> rejectPermission(@PathVariable UUID permissionId) {
+
+        Permission permission = permissionService.getPermission(permissionId);
+
+        if(permission == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        if(!permission.isActive()){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission is not active")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        permissionService.changePermissionPendingStatus(permission, false);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Permission rejected successfully")
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize("hasAuthority('Encargado')")
+    @PatchMapping("/permissions/delete/{permissionId}")
+    public ResponseEntity<GeneralResponse> deletePermission(@PathVariable UUID permissionId) {
+
+        Permission permission = permissionService.getPermission(permissionId);
+
+        if(permission == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        if(!permission.isActive()){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission is not active")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        permissionService.deletePermission(permission);
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Permission deleted successfully")
                         .build(),
                 HttpStatus.OK
         );

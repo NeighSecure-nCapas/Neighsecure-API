@@ -29,7 +29,7 @@ public class PermissionServiceImplementation implements PermissionService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void savePermission(PermissionDTO info, Key key, Home casa, User user) {
+    public void savePermission(PermissionDTO info, Key key, Home casa, User user, User permisoGenerador) {
         Permission permission = new Permission();
 
         permission.setType(info.getType());
@@ -37,20 +37,27 @@ public class PermissionServiceImplementation implements PermissionService {
         permission.setEndDate(info.getEndDate());
         permission.setStartTime(info.getStartTime());
         permission.setEndTime(info.getEndTime());
-        permission.setStatus(info.isStatus());
+        permission.setStatus(info.isStatus()); // si lo genera el encargado, se pone en true, sino en null
         permission.setKeyId(key);
         permission.setGenerationDate(info.getGenerationDate());
         permission.setDays(info.getDays());
         permission.setHomeId(casa);
         permission.setUserId(user);
+        permission.setUserAuth(permisoGenerador);
+        permission.setValid(false);
+        permission.setActive(true);
+
 
         permissionRepository.save(permission);
     }
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void deletePermission(UUID permissionId) {
-        permissionRepository.deleteById(permissionId);
+    public void deletePermission(Permission permissionId) {
+
+        permissionId.setActive(false);
+
+        permissionRepository.save(permissionId);
     }
 
     @Override
@@ -60,7 +67,12 @@ public class PermissionServiceImplementation implements PermissionService {
 
     @Override
     public List<Permission> getAllPermissions() {
-        return permissionRepository.findAll();
+        return permissionRepository.findAllByActiveIsTrue();
+    }
+
+    @Override
+    public List<Permission> getPermissionsByHome(Home homeId) {
+        return permissionRepository.findByHomeIdAndActiveIsTrue(homeId).orElse(null);
     }
 
     @Override
@@ -134,6 +146,6 @@ public class PermissionServiceImplementation implements PermissionService {
 
     @Override
     public Permission findPermissionByKeyId(Key keyId) {
-        return permissionRepository.findByKeyId(keyId).orElse(null);
+        return permissionRepository.findByKeyIdAndActiveIsTrue(keyId).orElse(null);
     }
 }
