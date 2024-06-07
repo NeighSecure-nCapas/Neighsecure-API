@@ -9,7 +9,7 @@ import java.util.UUID;
 public interface KeyService {
     // CRUD IMPLEMENTATION FOR KEY ENTITY
     // TODO: aplicar dtos
-    public void saveKey();
+    public void saveKey(Key key);
     public void deleteKey(String keyId);
 
     // hay q validar la vigencia del permiso

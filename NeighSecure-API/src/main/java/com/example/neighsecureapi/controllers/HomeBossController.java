@@ -136,32 +136,7 @@ public class HomeBossController {
 
     // GESTION DE VISITAS------------------------------------------------------------------
 
-    @PreAuthorize("hasAuthority('Encargado')")
-    @GetMapping("/permissions/home/{homeId}")
-    public ResponseEntity<GeneralResponse> getAllPermissionsByHome(@PathVariable UUID homeId) {
-
-        Home home = homeService.getHome(homeId);
-
-        if(home == null) {
-            return new ResponseEntity<>(
-                    new GeneralResponse.Builder()
-                            .message("Home not found")
-                            .build(),
-                    HttpStatus.NOT_FOUND
-            );
-        }
-
-        List<Permission> permissions = permissionService.getPermissionsByHome(home);
-        // TODO: validar si se debe retornar la lista de permisos entera o solo los que estan pendientes y aun son validos
-
-        return new ResponseEntity<>(
-                new GeneralResponse.Builder()
-                        .message("Permissions obtained successfully")
-                        .data(permissions)
-                        .build(),
-                HttpStatus.OK
-        );
-    }
+    // OBTENER TODOS LOS PERMISOS DE LA CASA EN CONTROLADOR DE RESIDENTE
 
     @PreAuthorize("hasAuthority('Encargado')")
     @GetMapping("permissions/{permissionId}")

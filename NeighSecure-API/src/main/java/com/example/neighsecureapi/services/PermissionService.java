@@ -1,6 +1,6 @@
 package com.example.neighsecureapi.services;
 
-import com.example.neighsecureapi.domain.dtos.PermissionDTO;
+import com.example.neighsecureapi.domain.dtos.permissionDTOs.PermissionDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Key;
 import com.example.neighsecureapi.domain.entities.Permission;
