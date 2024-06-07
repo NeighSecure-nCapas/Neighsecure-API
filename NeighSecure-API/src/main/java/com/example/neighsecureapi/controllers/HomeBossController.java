@@ -266,7 +266,7 @@ public class HomeBossController {
         );
     }
 
-    @PreAuthorize("hasAuthority('Encargado')")
+    @PreAuthorize("hasAuthority('Encargado')")// TODO:  validar si solo el encargado puede eliminar permisos
     @PatchMapping("/permissions/delete/{permissionId}")
     public ResponseEntity<GeneralResponse> deletePermission(@PathVariable UUID permissionId) {
 
