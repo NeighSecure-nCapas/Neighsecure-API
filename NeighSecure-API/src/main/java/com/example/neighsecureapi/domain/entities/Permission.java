@@ -41,7 +41,7 @@ public class Permission {
     @Column(name = "estado")// aprobado true, rechazado false, pendiente null
     private Boolean status;
 
-    @Column(name = "vigente")// aun es utilizable true, ya no false
+    @Column(name = "vigente")// aun es utilizable true, ya no false(y si no ha sido aprobado, no se puede usar)
     private boolean valid;
 
     // TODO: validar si esta bien la relacion
@@ -69,7 +69,7 @@ public class Permission {
     private User userAuth; // usuario que emitio el permiso
 
     @Column(name = "activo")
-    private boolean active;
+    private boolean active;// si el permiso sigue activo o no, para eliminarlo
 
     @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
     @JsonIgnore

@@ -1,6 +1,6 @@
 package com.example.neighsecureapi.services.serviceImpl;
 
-import com.example.neighsecureapi.domain.dtos.PermissionDTO;
+import com.example.neighsecureapi.domain.dtos.permissionDTOs.PermissionDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Key;
 import com.example.neighsecureapi.domain.entities.Permission;
@@ -11,9 +11,7 @@ import com.example.neighsecureapi.utils.ArrayManagementTools;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -37,14 +35,14 @@ public class PermissionServiceImplementation implements PermissionService {
         permission.setEndDate(info.getEndDate());
         permission.setStartTime(info.getStartTime());
         permission.setEndTime(info.getEndTime());
-        permission.setStatus(info.isStatus()); // si lo genera el encargado, se pone en true, sino en null
+        permission.setStatus(info.getStatus()); // si lo genera el encargado, se pone en true, sino en null
         permission.setKeyId(key);
         permission.setGenerationDate(info.getGenerationDate());
         permission.setDays(info.getDays());
         permission.setHomeId(casa);
         permission.setUserId(user);
         permission.setUserAuth(permisoGenerador);
-        permission.setValid(false);
+        permission.setValid(info.isValid());
         permission.setActive(true);
 
 
@@ -77,8 +75,8 @@ public class PermissionServiceImplementation implements PermissionService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void changePermissionValidationStatus(Permission permission) {
-        permission.setValid(false);
+    public void changePermissionValidationStatus(Permission permission, boolean status) {
+        permission.setValid(status);
         permissionRepository.save(permission);
 
     }
