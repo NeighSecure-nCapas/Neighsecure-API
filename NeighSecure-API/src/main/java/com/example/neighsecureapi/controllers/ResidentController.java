@@ -134,15 +134,17 @@ public class ResidentController {
         permissionDTO.setEndTime(info.getEndTime());
         permissionDTO.setDays(info.getDays());
         permissionDTO.setGenerationDate(Date.from(Instant.now()));// guardar la fecha actual
-        permissionDTO.setValid(true);
+
 
         // validar el rol del usuario que genera el permiso para saber si se aprueba automaticamente o no
         // si resident contiene el rol "Encargado" se aprueba automaticamente
 
         if(resident.getRolId().stream().anyMatch(obj -> obj.getRol().equals("Encargado"))) {
-            permissionDTO.setStatus(true);
+            permissionDTO.setStatus(true);// aprobado
+            permissionDTO.setValid(true);// valido
         } else {
-            permissionDTO.setStatus(null);
+            permissionDTO.setStatus(null);// sin aprobar, por tanto
+            permissionDTO.setValid(false);// el permiso aun no es valido
         }
 
         // genero la llave vacia para que se pueda generar el permiso

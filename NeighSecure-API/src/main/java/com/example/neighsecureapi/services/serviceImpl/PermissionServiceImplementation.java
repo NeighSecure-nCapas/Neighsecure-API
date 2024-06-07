@@ -75,8 +75,8 @@ public class PermissionServiceImplementation implements PermissionService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void changePermissionValidationStatus(Permission permission) {
-        permission.setValid(false);
+    public void changePermissionValidationStatus(Permission permission, boolean status) {
+        permission.setValid(status);
         permissionRepository.save(permission);
 
     }

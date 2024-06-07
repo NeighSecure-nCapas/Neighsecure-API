@@ -31,7 +31,7 @@ public interface PermissionService {
     public  List<Permission> getPermissionsByHome(Home homeId);
 
     // Cambiar estado de un permiso, si sigue siendo vigente para su uso
-    public void changePermissionValidationStatus(Permission permissionId);
+    public void changePermissionValidationStatus(Permission permissionId, boolean status);
     // cambia el estado de un permiso solicitado, lo valida el encargado si es un permiso valido o no
     public void changePermissionPendingStatus(Permission permissionId, boolean status);
 

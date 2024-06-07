@@ -136,9 +136,9 @@ public class HomeBossController {
 
     // GESTION DE VISITAS------------------------------------------------------------------
 
-    // OBTENER TODOS LOS PERMISOS DE LA CASA EN CONTROLADOR DE RESIDENTE
+    // <OBTENER TODOS LOS PERMISOS DE LA CASA EN CONTROLADOR DE RESIDENTE>
 
-    @PreAuthorize("hasAuthority('Encargado')")
+    @PreAuthorize("hasAnyAuthority('Encargado', 'Residente')")
     @GetMapping("permissions/{permissionId}")
     public ResponseEntity<GeneralResponse> getPermission(@PathVariable UUID permissionId) {
 
@@ -174,7 +174,7 @@ public class HomeBossController {
 
     @PreAuthorize("hasAuthority('Encargado')")
     @PatchMapping("/permissions/approve/{permissionId}")
-    public ResponseEntity<GeneralResponse> aprovePermission(@PathVariable UUID permissionId) {
+    public ResponseEntity<GeneralResponse> approvePermission(@PathVariable UUID permissionId) {
 
         Permission permission = permissionService.getPermission(permissionId);
 
@@ -198,6 +198,8 @@ public class HomeBossController {
 
         // envio el permiso y cambio el estado a aprobado
         permissionService.changePermissionPendingStatus(permission, true);
+        // cambio el estado a valido
+        permissionService.changePermissionValidationStatus(permission, true);
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
@@ -231,7 +233,9 @@ public class HomeBossController {
             );
         }
 
+        // cambiar estado a rechazado (false) y a invalido (false)
         permissionService.changePermissionPendingStatus(permission, false);
+        permissionService.changePermissionValidationStatus(permission, false);
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
