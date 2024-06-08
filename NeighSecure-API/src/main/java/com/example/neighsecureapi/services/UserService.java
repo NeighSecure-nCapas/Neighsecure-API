@@ -34,6 +34,7 @@ public interface UserService {
     public User findUserByName(String name);
     public User findByIdentifier(String identifier);
     public void setDuiAndPhoneToUser(User user, String dui, String phone);
+    public User findUserByToken(Token token);
     //public void updateHomeToUser(User user, Home home);
 
     // Integer getUsersNumberByRole(String date, String roleId);

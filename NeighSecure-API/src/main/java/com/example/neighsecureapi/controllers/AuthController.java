@@ -2,16 +2,15 @@ package com.example.neighsecureapi.controllers;
 
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.TokenDTO;
-import com.example.neighsecureapi.domain.dtos.userDTOs.GoogleLoginDTO;
-import com.example.neighsecureapi.domain.dtos.userDTOs.GoogleTokenInfo;
-import com.example.neighsecureapi.domain.dtos.userDTOs.LoginUserDTO;
-import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterUserDTO;
+import com.example.neighsecureapi.domain.dtos.userDTOs.*;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.Token;
 import com.example.neighsecureapi.domain.entities.User;
+import com.example.neighsecureapi.repositories.TokenRepository;
 import com.example.neighsecureapi.services.AuthService;
 import com.example.neighsecureapi.services.RoleService;
+import com.example.neighsecureapi.services.TokenService;
 import com.example.neighsecureapi.services.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
@@ -36,11 +35,13 @@ public class AuthController {
     private final UserService userService;
     private final RoleService roleService;
     private final AuthService authService;
+    private final TokenService tokenService;
 
-    public AuthController(UserService userService, RoleService roleService, AuthService authService) {
+    public AuthController(UserService userService, RoleService roleService, AuthService authService, TokenService tokenService) {
         this.userService = userService;
         this.roleService = roleService;
         this.authService = authService;
+        this.tokenService = tokenService;
     }
 
     @PostMapping("/register")
@@ -336,5 +337,29 @@ public class AuthController {
                             .build();
                     return Mono.just(new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR));
                 });
+    }
+
+    @GetMapping("/whoami")
+    public ResponseEntity<GeneralResponse> whoAmI(@RequestBody WhoAmIDTO token) {
+        Token tokenEntity = tokenService.findTokenBycontent(token.getToken());
+
+        User user = userService.findUserByToken(tokenEntity);
+
+        if (user == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Usuario no encontrado")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+        // TODO: implementar dto de presentación
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Usuario encontrado")
+                        .data(user)
+                        .build(),
+                HttpStatus.OK
+        );
     }
 }

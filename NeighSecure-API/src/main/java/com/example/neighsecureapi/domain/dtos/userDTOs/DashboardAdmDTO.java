@@ -1,5 +1,6 @@
 package com.example.neighsecureapi.domain.dtos.userDTOs;
 
+import com.example.neighsecureapi.domain.entities.Entry;
 import com.example.neighsecureapi.domain.entities.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,5 +16,6 @@ public class DashboardAdmDTO {
     int totalHomes;
     List<User> users;
 
-    // TODO: AGREGAR LOS CAMPOS QUE FALTAN DE LA DATA DE LA VISTA
+    List<Entry> entries;
+
 }
