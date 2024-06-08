@@ -41,6 +41,7 @@ public interface PermissionService {
 
     public Permission findPermissionByKeyId(Key keyId);
 
+    public List<Permission> getPermissionsByUser(User userId);
 
     /*
     metodos para setear bien los datos del atributo days en Permission, para manejarlo

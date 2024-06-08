@@ -10,7 +10,7 @@ public interface KeyService {
     // CRUD IMPLEMENTATION FOR KEY ENTITY
     // TODO: aplicar dtos
     public void saveKey(Key key);
-    public void deleteKey(String keyId);
+    public void deleteKey(Key keyId);
 
     // hay q validar la vigencia del permiso
     public void updateKey(Key key, KeyUpdateDTO info);
@@ -20,5 +20,6 @@ public interface KeyService {
     // END OF CRUD IMPLEMENTATION ---------------------------------------------------------------------
 
     // ADDITIONAL METHODS
+    public boolean keyIsStillValid(Key key);
 
 }
