@@ -5,9 +5,11 @@ import com.example.neighsecureapi.domain.entities.Key;
 import com.example.neighsecureapi.repositories.KeyRepository;
 import com.example.neighsecureapi.services.KeyService;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,8 +37,8 @@ public class KeyServiceImplementation implements KeyService {
     }
 
     @Override
-    public void deleteKey(String keyId) {
-
+    public void deleteKey(Key keyId) {
+        keyRepository.delete(keyId);
     }
 
     @Override
@@ -58,5 +60,26 @@ public class KeyServiceImplementation implements KeyService {
     public List<Key> getAllKeys() {
         return keyRepository.findAll();
         // innecesario
+    }
+
+    @Override
+    public boolean keyIsStillValid(Key key) {
+        // valida si la hora y fecha actual es antes que 10 minutos de la hora y fecha de generacion de la llave
+
+        return key.getGenerationTime().after(Date.from(Instant.now().minus(10, ChronoUnit.MINUTES) ));
+
+        /*
+        funcion de copilot
+        // Obtén la hora actual
+        Date currentTime = new Date();
+
+        // Calcula la diferencia en minutos
+        long diffInMillies = Math.abs(currentTime.getTime() - key.getGenerationTime().getTime());
+        long diffInMinutes = TimeUnit.MINUTES.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+        // Si la diferencia es menor o igual a 10, la hora es válida
+        return diffInMinutes <= 10;
+        * */
+
     }
 }

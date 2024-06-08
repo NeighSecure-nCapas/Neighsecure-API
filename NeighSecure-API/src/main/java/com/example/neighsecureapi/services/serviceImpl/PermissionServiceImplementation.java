@@ -146,4 +146,11 @@ public class PermissionServiceImplementation implements PermissionService {
     public Permission findPermissionByKeyId(Key keyId) {
         return permissionRepository.findByKeyIdAndActiveIsTrue(keyId).orElse(null);
     }
+
+    @Override
+    public List<Permission> getPermissionsByUser(User userId) {
+        // para visitantes
+        return permissionRepository.findAllByUserIdAndActiveIsTrueAndValidIsTrueAndStatusIsTrue(userId);
+    }
+
 }
