@@ -141,6 +141,11 @@ public class UserServiceImplementation implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public User findUserByToken(Token token) {
+        return userRepository.findByTokens(List.of(token)).orElse(null);
+    }
+
     // TOKEN -----------------------------------------------------------------------
 
     @Override
