@@ -57,15 +57,17 @@ public class Permission {
     private String days; // metodo del servicio para que reciba varios dias
 
     @JoinColumn(name = "casaId") // TODO: LLAVE FORANEA
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Home homeId;
 
     @JoinColumn(name = "usuarioId") // TODO: LLAVE FORANEA
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
+    //@JsonIgnore
     private User userId;// usuario al que pertenece el permiso
 
     @JoinColumn(name = "usuarioAuth") // TODO: LLAVE FORANEA
-    @ManyToOne(fetch = FetchType.LAZY )
+    @ManyToOne(fetch = FetchType.EAGER )
+    //@JsonIgnore
     private User userAuth; // usuario que emitio el permiso
 
     @Column(name = "activo")

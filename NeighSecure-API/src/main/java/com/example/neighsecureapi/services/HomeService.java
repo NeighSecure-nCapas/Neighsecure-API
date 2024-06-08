@@ -35,5 +35,7 @@ public interface HomeService {
     // METHODS FOR HOME MEMBERS VALIDATION ------------------------------------------------------------------------
     public boolean validateHomeMembersCapacity(Home home);
 
+    public boolean homeContainsUser(Home home, User user);
+
 
 }

@@ -1,5 +1,6 @@
 package com.example.neighsecureapi.domain.dtos.permissionDTOs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -13,20 +14,20 @@ public class RegisterPermissionDTO {
     @NotBlank
     private String type;
 
-    @NotBlank
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date startDate;
 
-    @NotBlank
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     private Date endDate;
 
-    @NotBlank
-    @DateTimeFormat(pattern = "HH:mm")
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private Date startTime;
 
-    @NotBlank
-    @DateTimeFormat(pattern = "HH:mm")
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private Date endTime;
 
     @NotBlank

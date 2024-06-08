@@ -104,6 +104,17 @@ public class ResidentController {
                     HttpStatus.NOT_FOUND
             );
         }
+        // validar que la casa pertenezca a quien emite el permiso
+        // TODO: hacer funcion que valide si el residente pertenece a la casa
+        if(!homeService.homeContainsUser(home, resident)) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("The home does not belong to the resident")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
         // validacion de las fechas, que todas sean mayores a la fecha actual
 
         if(info.getStartDate().before(Date.from(Instant.now()))) {

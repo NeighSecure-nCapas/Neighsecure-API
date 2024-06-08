@@ -140,4 +140,13 @@ public class HomeServiceImplementation implements HomeService {
         return (home.getHomeMemberId().size() + 1) <= home.getMembersNumber();
     }
 
+    @Override
+    public boolean homeContainsUser(Home home, User user) {
+        // validar si el usuario es miembro de la casa
+        if(home.getHomeMemberId().contains(user)){
+            return true;
+        }else return home.getHomeOwnerId().equals(user);
+
+    }
+
 }

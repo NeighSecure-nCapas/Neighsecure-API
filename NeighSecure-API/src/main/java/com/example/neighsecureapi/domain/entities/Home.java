@@ -39,7 +39,7 @@ public class Home {
     @Column(name = "usuarioIdHabitante", nullable = true)
     @JsonBackReference
     @OneToMany(fetch = FetchType.EAGER)// mappedBy = "homeId",
-    //@JsonIgnore
+    @JsonIgnore
     private List<User> homeMemberId;
 
     @JsonBackReference
