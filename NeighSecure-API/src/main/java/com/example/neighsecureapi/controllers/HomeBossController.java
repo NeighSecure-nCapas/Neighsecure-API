@@ -139,7 +139,7 @@ public class HomeBossController {
     // <OBTENER TODOS LOS PERMISOS DE LA CASA EN CONTROLADOR DE RESIDENTE>
 
     @PreAuthorize("hasAnyAuthority('Encargado', 'Residente')")
-    @GetMapping("permissions/{permissionId}")
+    @GetMapping("/permissions/{permissionId}")
     public ResponseEntity<GeneralResponse> getPermission(@PathVariable UUID permissionId) {
 
         Permission permission = permissionService.getPermission(permissionId);

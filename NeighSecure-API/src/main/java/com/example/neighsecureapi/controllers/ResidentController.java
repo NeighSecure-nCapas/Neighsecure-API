@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("neighSecure/resident")
+@RequestMapping("/neighSecure/resident")
 @Slf4j
 public class ResidentController {
 
