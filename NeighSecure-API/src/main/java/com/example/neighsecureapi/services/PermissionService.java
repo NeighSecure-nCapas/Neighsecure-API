@@ -13,6 +13,7 @@ public interface PermissionService {
 
     // CRUD IMPLEMENTATION FOR PERMISSION ENTITY
     public void savePermission(PermissionDTO info, Key llave, Home casa, User user, User encargado); // hay q validar el rol q genera el permiso
+    public void saveCreatedPermission(Permission permission);
     public void deletePermission(Permission permissionId);
 
     // public void updatePermission(String permissionId);
@@ -38,6 +39,7 @@ public interface PermissionService {
     // Validar vigencia de permisos
     // TODO: validar la relacion entre llave y permiso, puede q el id del permiso vaya en la tabla de llave y no al revez
     public boolean validatePermission(Permission permission, Key key);
+    public boolean validateDayOfPermission(Permission permission, Key key);
 
     public Permission findPermissionByKeyId(Key keyId);
 

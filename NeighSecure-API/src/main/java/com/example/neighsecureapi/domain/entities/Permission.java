@@ -23,7 +23,7 @@ public class Permission {
     private UUID id;
 
     @Column(name = "tipoPermiso")
-    private String type;
+    private String type; // Unica, Multiple, Anonima
 
     @Column(name = "fechaInicio")
     private Date startDate;

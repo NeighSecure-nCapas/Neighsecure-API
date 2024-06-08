@@ -50,6 +50,11 @@ public class PermissionServiceImplementation implements PermissionService {
     }
 
     @Override
+    public void saveCreatedPermission(Permission permission) {
+        permissionRepository.save(permission);
+    }
+
+    @Override
     @Transactional(rollbackOn = Exception.class)
     public void deletePermission(Permission permissionId) {
 
@@ -124,19 +129,29 @@ public class PermissionServiceImplementation implements PermissionService {
         * */
 
         // VALIDAR  SI LA FECHA DE LA KEY ESTA DENTRO DE LAS FECHAS DEL PERMISO
-        if(key.getGenerationDate().after(permission.getStartDate()) && key.getGenerationDate().before(permission.getEndDate())) {
+        if(key.getGenerationDate().compareTo(permission.getStartDate()) >= 0
+                && key.getGenerationDate().compareTo(permission.getEndDate()) <= 0) {
             // VALIDAR SI LA HORA DE LA KEY ESTA DENTRO DE LAS HORAS DEL PERMISO
-            if (key.getGenerationTime().after(permission.getStartTime()) && key.getGenerationTime().before(permission.getEndTime())) {
+            if (key.getGenerationTime().compareTo(permission.getStartTime()) >= 0
+                    && key.getGenerationTime().compareTo(permission.getEndTime()) <= 0) {
 
-                // Debo obtener el arreglo de dias de la semana en base al string de dias en permiso
-                List<String> permissionDays = arrayManagementTools.convertStringToList(permission.getDays());
-
-                // VALIDAR SI EL DIA DE LA KEY ESTA DENTRO DE LOS DIAS DEL PERMISO
-                if (permissionDays.contains(key.getGenerationDay())) {
-
-                    return true;
-                }
+                return true;
             }
+        }
+
+        return false;
+    }
+
+    @Override
+    public boolean validateDayOfPermission(Permission permission, Key key) {
+
+        // Debo obtener el arreglo de dias de la semana en base al string de dias en permiso
+        List<String> permissionDays = arrayManagementTools.convertStringToList(permission.getDays());
+
+        // VALIDAR SI EL DIA DE LA KEY ESTA DENTRO DE LOS DIAS DEL PERMISO
+        if (permissionDays.contains(key.getGenerationDay())) {
+
+            return true;
         }
 
         return false;
