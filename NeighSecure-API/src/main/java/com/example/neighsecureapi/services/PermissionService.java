@@ -13,6 +13,7 @@ public interface PermissionService {
 
     // CRUD IMPLEMENTATION FOR PERMISSION ENTITY
     public void savePermission(PermissionDTO info, Key llave, Home casa, User user, User encargado); // hay q validar el rol q genera el permiso
+    public void saveCreatedPermission(Permission permission);
     public void deletePermission(Permission permissionId);
 
     // public void updatePermission(String permissionId);

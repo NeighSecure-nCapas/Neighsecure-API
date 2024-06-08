@@ -50,6 +50,11 @@ public class PermissionServiceImplementation implements PermissionService {
     }
 
     @Override
+    public void saveCreatedPermission(Permission permission) {
+        permissionRepository.save(permission);
+    }
+
+    @Override
     @Transactional(rollbackOn = Exception.class)
     public void deletePermission(Permission permissionId) {
 
