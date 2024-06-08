@@ -5,6 +5,7 @@ import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryRegisterDTO;
 import com.example.neighsecureapi.domain.dtos.entryDTOs.ObtainEntryDTO;
 import com.example.neighsecureapi.domain.dtos.permissionDTOs.PermissionDTO;
 import com.example.neighsecureapi.domain.entities.Entry;
+import com.example.neighsecureapi.domain.entities.Key;
 import com.example.neighsecureapi.domain.entities.Permission;
 import com.example.neighsecureapi.domain.entities.Terminal;
 import com.example.neighsecureapi.services.*;
@@ -13,10 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.Date;
@@ -79,6 +77,122 @@ public class GuardController {
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Anonymous entry registered")
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize("hasAuthority('Vigilante')")
+    @PostMapping("/entry")
+    public ResponseEntity<GeneralResponse> entry(@RequestBody @Valid ObtainEntryDTO data) {
+
+        // validar que la terminal existe
+        Terminal terminal = terminalService.getTerminalById(data.getTerminalId());
+
+        if (terminal == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Terminal not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        // validar que el permiso existe
+        Permission permission = permissionService.getPermission(data.getPermissionId());
+
+        if (permission == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        // validar si la llave aun es valida
+        Key key = permission.getKeyId();
+
+        if(!keyService.keyIsStillValid(key)){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Key is no longer valid")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        // validar que el permiso este aprobado
+        if (permission.getStatus() == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission is pending")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
+        if (!permission.getStatus()) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission is rejected")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+        // todo: agregar los 30 minutos de gracia para la validacion
+        // validar que el permiso siga siendo valido, si la fecha de key esta dentro del rango de tiempo de permission
+        if(!permissionService.validatePermission(permission, key)){
+            // si ya no es valido, se cambia el valid del permiso
+            permissionService.changePermissionValidationStatus(permission, false);
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission is no longer valid")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        } else if (!permissionService.validateDayOfPermission(permission, key)) {// la fecha de la key si esta dentro del rango de permission, validar si el dia de la semana esta dentro de los dias del permiso
+
+            // si no se encuentra el dia, entonces no tiene permiso de entrar ese dia
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Invalid day to enter")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+
+        }
+
+        // si el permiso si es valido, se guarda la entrada
+
+        EntryRegisterDTO entryRegisterDTO = new EntryRegisterDTO();
+        entryRegisterDTO.setDateAndHour(data.getDateAndHour());
+        entryRegisterDTO.setComment(data.getComment());
+
+        entryService.saveEntry(entryRegisterDTO, terminal, permission);
+
+        // se valida el tipo de permiso para saber si se debe cambiar el estado del permiso
+        if(permission.getType().equals("Unica")){
+            // si es entrada Unica, entonces el permiso deja de ser valido una vez se registro la entrada
+            permissionService.changePermissionValidationStatus(permission, false);
+        }
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Entry registered")
+                        .data(permission)// devuelvo el permiso para que el guardia pueda ver la info del permiso
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize("hasAuthority('Vigilante')")
+    @GetMapping("/terminal")
+    public ResponseEntity<GeneralResponse> getTerminals() {
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Terminals obtained")
+                        .data(terminalService.getAllTerminals())
                         .build(),
                 HttpStatus.OK
         );
