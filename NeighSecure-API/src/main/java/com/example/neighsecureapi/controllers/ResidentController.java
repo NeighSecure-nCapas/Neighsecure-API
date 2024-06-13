@@ -116,11 +116,12 @@ public class ResidentController {
 
         // validacion de las fechas, que todas sean mayores a la fecha actual
         //TODO: VALIDAR POR QUE RESTA 1 A LA FECHA RECIBIDA
-        LocalDate startDate = LocalDate.ofInstant(info.getStartDate().toInstant(), ZoneId.systemDefault());
+        // SI RECIBE LOCALdATE NO SURGE EL ERROR DE RESTAR 1, ver registerPermissionDTO
+        //LocalDate startDate = LocalDate.ofInstant(info.getStartDate().toInstant(), ZoneId.systemDefault());
         LocalDate now = LocalDate.now();
         log.info("Fecha actual: " + now);
-        log.info("Fecha de inicio: " + startDate);
-        if(startDate.isBefore(now)) {
+        log.info("Fecha de inicio: " + info.getStartDate());
+        if(info.getStartDate().compareTo(now) < 0) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
                             .message("The start date must be greater than the current date")
@@ -129,10 +130,10 @@ public class ResidentController {
             );
         }
 
-        LocalDate endDate = LocalDate.ofInstant(info.getEndDate().toInstant(), ZoneId.systemDefault());
+        //LocalDate endDate = LocalDate.ofInstant(info.getEndDate().toInstant(), ZoneId.systemDefault());
         LocalDate nowEnd = LocalDate.now();
 
-        if(endDate.isBefore(nowEnd) || endDate.isBefore(startDate)) {
+        if(info.getEndDate().compareTo(nowEnd) < 0 || info.getEndDate().isBefore(info.getStartDate())) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
                             .message("The end date must be greater than the current date")
@@ -140,6 +141,7 @@ public class ResidentController {
                     HttpStatus.BAD_REQUEST
             );
         }
+
 
         // creacion del objeto PermissionDTO para guardar el permiso
 

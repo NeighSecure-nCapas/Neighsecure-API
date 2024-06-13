@@ -162,7 +162,6 @@ public class HomeBossController {
             );
         }
 
-        log.info("Permission obtained successfully");
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()

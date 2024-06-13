@@ -7,7 +7,9 @@ import com.example.neighsecureapi.services.KeyService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -66,7 +68,9 @@ public class KeyServiceImplementation implements KeyService {
     public boolean keyIsStillValid(Key key) {
         // valida si la hora y fecha actual es antes que 10 minutos de la hora y fecha de generacion de la llave
 
-        return key.getGenerationTime().after(Date.from(Instant.now().minus(10, ChronoUnit.MINUTES) ));
+        //return key.getGenerationTime().after(Date.from(Instant.now().minus(10, ChronoUnit.MINUTES) ));
+
+        return Duration.between(key.getGenerationTime(), LocalTime.now()).toMinutes() < 10;
 
         /*
         funcion de copilot

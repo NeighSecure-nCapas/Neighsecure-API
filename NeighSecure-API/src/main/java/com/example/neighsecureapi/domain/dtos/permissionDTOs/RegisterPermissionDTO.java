@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -16,19 +18,19 @@ public class RegisterPermissionDTO {
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private Date startDate;
+    private LocalDate startDate;
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private Date endDate;
+    private LocalDate endDate;
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private Date startTime;
+    private LocalTime startTime;
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private Date endTime;
+    private LocalTime endTime;
 
     @NotBlank
     private String days;

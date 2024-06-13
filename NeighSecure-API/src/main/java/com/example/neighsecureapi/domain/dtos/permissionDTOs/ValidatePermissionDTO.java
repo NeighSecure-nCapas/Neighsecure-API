@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Null;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -15,11 +17,11 @@ public class ValidatePermissionDTO {
     // campos de la llave
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
-    private Date generationDate;
+    private LocalDate generationDate;
 
     @NotNull
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
-    private Date generationTime;
+    private LocalTime generationTime;
 
     @NotBlank
     private String generationDay;
