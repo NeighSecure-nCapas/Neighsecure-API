@@ -44,7 +44,7 @@ public class Home {
 
     @JsonBackReference
     @OneToMany(mappedBy = "homeId", fetch = FetchType.LAZY)
-    //@JsonIgnore
+    @JsonIgnore
     private List<Permission> permissions;
 
     @Column(name = "estadoCasa")

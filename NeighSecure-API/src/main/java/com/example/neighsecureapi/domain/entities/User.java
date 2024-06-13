@@ -38,7 +38,6 @@ public class User implements UserDetails {
     @Column(name = "telefono")
     private String phone;
 
-    // TODO: ver como agregar varios roles
     @Column(name = "rolId")
     @JsonManagedReference
     @ManyToMany(fetch = FetchType.LAZY)
