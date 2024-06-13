@@ -58,13 +58,13 @@ public class GuardController {
         }
 
         // el permiso no se valida porque es nulo al ser entrada anonima, pero se genera uno con tipo de entrada Anonima
-        Permission permission = new Permission(UUID.randomUUID(), "Anonima",
-                null, null, null, null, null,
-                true, null, Date.from(Instant.now()), null, null,
-                null, null, true, null);
+        //Permission permission = new Permission(UUID.randomUUID(), "Anonima",
+                //null, null, null, null, null,
+                //true, null, Date.from(Instant.now()), null, null,
+                //null, null, true, null);
 
         // guardo el permiso creado
-        permissionService.saveCreatedPermission(permission);
+        //permissionService.saveCreatedPermission(permission);
 
 
         // guardar la entrada anonima
@@ -72,7 +72,8 @@ public class GuardController {
         entryRegisterDTO.setDateAndHour(data.getDateAndHour());
         entryRegisterDTO.setComment(data.getComment());
 
-        entryService.saveEntry(entryRegisterDTO, terminal, permission);
+        // envio permiso null por q al ser anonima no tiene permiso relacionado
+        entryService.saveEntry(entryRegisterDTO, terminal, null);
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
