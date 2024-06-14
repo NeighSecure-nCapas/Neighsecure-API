@@ -36,12 +36,13 @@ public class VisitController {
     }
 
     @PreAuthorize("hasAnyAuthority('Visitante')")
-    @GetMapping("/myPermissions/{userId}")
-    public ResponseEntity<GeneralResponse> getMyPermissions(@PathVariable UUID userId) {
+    @GetMapping("/myPermissions")
+    public ResponseEntity<GeneralResponse> getMyPermissions(@RequestHeader("Authorization") String bearerToken) {
 
-        // TODO: ver si con solo el token de auth se puede obtener el usuario
-        // TODO: ver si solo mandar la data necesaria para mostrar en el permiso asi como el uuid
-        User user = userService.getUser(userId);
+        String token = bearerToken.substring(7);
+        Token tokenEntity = tokenService.findTokenBycontent(token);
+
+        User user = userService.findUserByToken(tokenEntity);
 
         if(user == null) {
             return new ResponseEntity<>(
