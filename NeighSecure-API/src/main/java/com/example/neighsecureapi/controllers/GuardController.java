@@ -109,7 +109,7 @@ public class GuardController {
             entryRegisterDTO.setDateAndHour(data.getDateAndHour());
             entryRegisterDTO.setComment(data.getComment());
 
-            entryService.saveEntry(entryRegisterDTO, terminal, null);
+            entryService.saveEntry(entryRegisterDTO, terminal, permissionService.findPermissionByKeyId(keyService.getKey(data.getKeyId())));
 
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()

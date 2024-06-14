@@ -1,12 +1,12 @@
 package com.example.neighsecureapi.controllers;
 
 
-import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeFullDataDTO;
-import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDataDTO;
+import com.example.neighsecureapi.domain.dtos.entryDTOs.PresentationEntryDTO;
+import com.example.neighsecureapi.domain.dtos.homeDTOs.*;
 import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryBoardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
-import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.DashboardAdmDTO;
+import com.example.neighsecureapi.domain.dtos.userDTOs.PresentationUserDetailsDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.RoleUpdateDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.UserResponseDTO;
 import com.example.neighsecureapi.domain.entities.Entry;
@@ -103,12 +103,17 @@ public class AdminController {
             );
         }
 
-        // TODO: presentationDTO
+        PresentationUserDetailsDTO userP = new PresentationUserDetailsDTO();
+        userP.setId(user.getId());
+        userP.setName(user.getName());
+        userP.setEmail(user.getEmail());
+        userP.setPhoneNumber(user.getPhone());
+        userP.setRoles(user.getRolId());
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuarios obtenidos con exito")
-                        .data(user)
+                        .message("Usuario obtenido con exito")
+                        .data(userP)
                         .build(),
                 HttpStatus.OK
         );
@@ -176,12 +181,17 @@ public class AdminController {
             );
         }
 
-        // TODO: presentationDTO
+        PresentationUserDetailsDTO userP = new PresentationUserDetailsDTO();
+        userP.setId(user.getId());
+        userP.setName(user.getName());
+        userP.setEmail(user.getEmail());
+        userP.setPhoneNumber(user.getPhone());
+        userP.setRoles(user.getRolId());
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Usuarios obtenidos con exito")
-                        .data(user)
+                        .data(userP)
                         .build(),
                 HttpStatus.OK
         );
@@ -231,10 +241,22 @@ public class AdminController {
     @GetMapping("/homes")
     public ResponseEntity<GeneralResponse> getAllHomes() {
 
+        List<Home> homes = homeService.getAllHomes();
+
+        // se mapea la lista de casas a un dto para no enviar la data sensible
+        List<PresentationHomeDTO> homesDTO = homes
+                .stream().map(home -> {
+                    PresentationHomeDTO homeDTO = new PresentationHomeDTO();
+                    homeDTO.setId(home.getId());
+                    homeDTO.setHomeNumber(home.getHomeNumber());
+                    homeDTO.setHomeBoss(home.getHomeOwnerId().getName());
+                    return homeDTO;
+                }).toList();
+
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Casas obtenidas con exito")
-                        .data(homeService.getAllHomes())
+                        .data(homesDTO)
                         .build(),
                 HttpStatus.OK
         );
@@ -255,13 +277,40 @@ public class AdminController {
             );
         }
 
-        HomeFullDataDTO homeFullDataDTO = new HomeFullDataDTO();
+//        HomeFullDataDTO homeFullDataDTO = new HomeFullDataDTO();
+//        homeFullDataDTO.setId(home.getId());
+//        homeFullDataDTO.setHomeNumber(home.getHomeNumber());
+//        homeFullDataDTO.setAddress(home.getAddress());
+//        homeFullDataDTO.setMembersNumber(home.getMembersNumber());
+//        homeFullDataDTO.setUserAdmin(home.getHomeOwnerId());
+//        homeFullDataDTO.setHomeMembers(home.getHomeMemberId());
+
+        PresentationHomeDetailDTO homeFullDataDTO = new PresentationHomeDetailDTO();
         homeFullDataDTO.setId(home.getId());
         homeFullDataDTO.setHomeNumber(home.getHomeNumber());
-        homeFullDataDTO.setAddress(home.getAddress());
         homeFullDataDTO.setMembersNumber(home.getMembersNumber());
-        homeFullDataDTO.setUserAdmin(home.getHomeOwnerId());
-        homeFullDataDTO.setHomeMembers(home.getHomeMemberId());
+
+        // setear el jefe de la casa
+        PresentationUserDetailsDTO homeBoss = new PresentationUserDetailsDTO();
+        homeBoss.setId(home.getHomeOwnerId().getId());
+        homeBoss.setName(home.getHomeOwnerId().getName());
+        homeBoss.setEmail(home.getHomeOwnerId().getEmail());
+        homeBoss.setPhoneNumber(home.getHomeOwnerId().getPhone());
+        homeBoss.setRoles(home.getHomeOwnerId().getRolId());
+        homeFullDataDTO.setHomeBoss(homeBoss);
+
+        // setear los miembros de la casa
+        List<PresentationUserDetailsDTO> homeMembers = new ArrayList<>();
+        for(User member : home.getHomeMemberId()) {
+            PresentationUserDetailsDTO memberDTO = new PresentationUserDetailsDTO();
+            memberDTO.setId(member.getId());
+            memberDTO.setName(member.getName());
+            memberDTO.setEmail(member.getEmail());
+            memberDTO.setPhoneNumber(member.getPhone());
+            memberDTO.setRoles(member.getRolId());
+            homeMembers.add(memberDTO);
+        }
+        homeFullDataDTO.setMembers(homeMembers);
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
@@ -428,15 +477,35 @@ public class AdminController {
 
         // se mapea la lista de entradas a un dto para no enviar la data sensible y dar formato
 
-        List<EntryBoardAdmDTO> entries = entryService.getAllEntries()
+//        List<EntryBoardAdmDTO> entries = entryService.getAllEntries()
+//                .stream().map(entry -> {
+//                    EntryBoardAdmDTO entryBoardAdmDTO = new EntryBoardAdmDTO();
+//                    entryBoardAdmDTO.setId(entry.getId());
+//                    entryBoardAdmDTO.setDate(entry.getEntryDate());
+//                    entryBoardAdmDTO.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+//                    entryBoardAdmDTO.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+//                    entryBoardAdmDTO.setEntryType(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
+//                    return entryBoardAdmDTO;
+//                }).toList();
+
+        List<PresentationEntryDTO> entries = entryService.getAllEntries()
                 .stream().map(entry -> {
-                    EntryBoardAdmDTO entryBoardAdmDTO = new EntryBoardAdmDTO();
-                    entryBoardAdmDTO.setId(entry.getId());
-                    entryBoardAdmDTO.setDate(entry.getEntryDate());
-                    entryBoardAdmDTO.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
-                    entryBoardAdmDTO.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
-                    entryBoardAdmDTO.setEntryType(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
-                    return entryBoardAdmDTO;
+                    PresentationEntryDTO entryDTO = new PresentationEntryDTO();
+                    entryDTO.setId(entry.getId());
+                    entryDTO.setDate(entry.getEntryDate());
+
+                    // validar si el permiso existe
+                    if(entry.getPermissionId() != null) {
+                        entryDTO.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+                        entryDTO.setEntryType(entry.getPermissionId().getType());
+                        entryDTO.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+                    } else {
+                        entryDTO.setUser("-");
+                        entryDTO.setEntryType("Anonima");
+                        entryDTO.setHomeNumber(0);// no hay permiso, por tanto es anonima
+                    }
+
+                    return entryDTO;
                 }).toList();
 
 

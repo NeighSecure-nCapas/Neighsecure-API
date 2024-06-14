@@ -26,13 +26,15 @@ public class VisitController {
     private final KeyService keyService;
     private final RoleService roleService;
     private final TokenService tokenService;
+    private final HomeService homeService;
 
-    public VisitController(UserService userService, PermissionService permissionService, KeyService keyService, RoleService roleService, TokenService tokenService) {
+    public VisitController(UserService userService, PermissionService permissionService, KeyService keyService, RoleService roleService, TokenService tokenService, HomeService homeService) {
         this.userService = userService;
         this.permissionService = permissionService;
         this.keyService = keyService;
         this.roleService = roleService;
         this.tokenService = tokenService;
+        this.homeService = homeService;
     }
 
     @PreAuthorize("hasAnyAuthority('Visitante')")
@@ -84,7 +86,7 @@ public class VisitController {
             );
         }
 
-        // si el rol es de visitante
+        // si el rol es de Residente
         Role residenteRol = roleService.getRoleByName("Residente");
 
         if(!user.getRolId().contains(residenteRol)) {
@@ -162,7 +164,18 @@ public class VisitController {
 
         // se crea una nueva llave
         Key key = new Key();
-        key.setKeyId(UUID.randomUUID());
+        keyService.saveKey(key);
+        // se crea un nuevo permiso valido para el residente junto a su llave
+        Permission permission = new Permission();
+        permission.setId(UUID.randomUUID());
+        permission.setUserId(user);
+        permission.setKeyId(key);
+        permission.setHomeId(homeService.findHomeByUser(user));
+        permission.setValid(true);
+        permission.setActive(true);
+        permission.setStatus(true);
+        permission.setType("Residente");
+        permissionService.saveCreatedPermission(permission);
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
