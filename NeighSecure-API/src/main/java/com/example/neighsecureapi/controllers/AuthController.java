@@ -340,8 +340,19 @@ public class AuthController {
     }
 
     @GetMapping("/whoami")
-    public ResponseEntity<GeneralResponse> whoAmI(@RequestBody WhoAmIDTO token) {
-        Token tokenEntity = tokenService.findTokenBycontent(token.getToken());
+    public ResponseEntity<GeneralResponse> whoAmI(@RequestHeader("Authorization") String bearerToken) {
+
+        if (bearerToken == null || bearerToken.isEmpty()) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .build(),
+                    HttpStatus.UNAUTHORIZED
+            );
+        }
+
+        String token = bearerToken.substring(7);
+
+        Token tokenEntity = tokenService.findTokenBycontent(token);
 
         User user = userService.findUserByToken(tokenEntity);
 
