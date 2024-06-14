@@ -11,6 +11,11 @@ import com.example.neighsecureapi.utils.ArrayManagementTools;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -155,6 +160,28 @@ public class PermissionServiceImplementation implements PermissionService {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean validateTimeOfPermission(Permission permission) {
+
+        // si hoy es despues que la ultima fecha, la fecha de finalizacion
+        if(LocalDate.now().compareTo(permission.getEndDate()) > 0) {
+            return false;
+        }else if(LocalDate.now().compareTo(permission.getEndDate()) == 0){
+            // si hoy es igual a la ultima fecha, validar la hora
+            //SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+
+            //String currentHour = sdf.format(Date.from(Instant.now()));
+            //String permissionEndHour = sdf.format(permission.getEndTime());
+
+            if (LocalTime.now().compareTo(permission.getEndTime()) > 0) {
+                return false;
+            }
+        }
+        // si llega aqui es por q no es el ultimo dia ni hora de uso del permiso
+
+        return true;
     }
 
     @Override

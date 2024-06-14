@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -25,18 +27,18 @@ public class Permission {
     @Column(name = "tipoPermiso")
     private String type; // Unica, Multiple, Anonima
 
-    @Column(name = "fechaInicio")
-    private Date startDate;
+    @Column(name = "fechaInicio")// año-mes-dia
+    private LocalDate startDate;
 
-    @Column(name = "fechaFin")
-    private Date endDate;
+    @Column(name = "fechaFin")// año-mes-dia
+    private LocalDate endDate;
 
     // TODO: validar la forma en que solo reciba horas y minutos
-    @Column(name = "horaInicio")
-    private Date startTime;
+    @Column(name = "horaInicio")//horas:minutos:segundos
+    private LocalTime startTime;
 
     @Column(name = "horaFin")
-    private Date endTime;
+    private LocalTime endTime;
 
     @Column(name = "estado")// aprobado true, rechazado false, pendiente null
     private Boolean status;
@@ -57,15 +59,17 @@ public class Permission {
     private String days; // metodo del servicio para que reciba varios dias
 
     @JoinColumn(name = "casaId") // TODO: LLAVE FORANEA
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Home homeId;
 
     @JoinColumn(name = "usuarioId") // TODO: LLAVE FORANEA
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
+    //@JsonIgnore
     private User userId;// usuario al que pertenece el permiso
 
     @JoinColumn(name = "usuarioAuth") // TODO: LLAVE FORANEA
-    @ManyToOne(fetch = FetchType.LAZY )
+    @ManyToOne(fetch = FetchType.EAGER )
+    //@JsonIgnore
     private User userAuth; // usuario que emitio el permiso
 
     @Column(name = "activo")

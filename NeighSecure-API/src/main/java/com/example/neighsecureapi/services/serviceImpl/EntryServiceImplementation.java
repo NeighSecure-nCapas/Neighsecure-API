@@ -9,6 +9,7 @@ import com.example.neighsecureapi.services.EntryService;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,5 +51,11 @@ public class EntryServiceImplementation implements EntryService {
     public List<Entry> getAllEntries() {
         return entryRepository.findAll();
     }
+
+    @Override
+    public List<Entry> getAllEntriesByDate(Date date) {
+        return entryRepository.findAllByEntryDate(date);
+    }
+
 
 }

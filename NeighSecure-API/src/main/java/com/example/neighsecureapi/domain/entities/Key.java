@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -20,11 +22,11 @@ public class Key {
     private UUID keyId;
 
     // TODO: validar formatos de fecha y horas
-    @Column(name = "fechaGenerada")
-    private Date generationDate;
+    @Column(name = "fechaGenerada")// año-mes-dia
+    private LocalDate generationDate;
 
-    @Column(name = "horaGenerada")
-    private Date generationTime;
+    @Column(name = "horaGenerada")// horas:minutos:segundos
+    private LocalTime generationTime;
 
     @Column(name = "diaGenerado")
     private String generationDay;

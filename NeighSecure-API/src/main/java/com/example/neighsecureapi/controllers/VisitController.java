@@ -3,14 +3,9 @@ package com.example.neighsecureapi.controllers;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.KeyUpdateDTO;
 import com.example.neighsecureapi.domain.dtos.permissionDTOs.ValidatePermissionDTO;
-import com.example.neighsecureapi.domain.entities.Key;
-import com.example.neighsecureapi.domain.entities.Permission;
-import com.example.neighsecureapi.domain.entities.Role;
-import com.example.neighsecureapi.domain.entities.User;
-import com.example.neighsecureapi.services.KeyService;
-import com.example.neighsecureapi.services.PermissionService;
-import com.example.neighsecureapi.services.RoleService;
-import com.example.neighsecureapi.services.UserService;
+import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterDuiAndPhoneDTO;
+import com.example.neighsecureapi.domain.entities.*;
+import com.example.neighsecureapi.services.*;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,20 +25,24 @@ public class VisitController {
     private final PermissionService permissionService;
     private final KeyService keyService;
     private final RoleService roleService;
+    private final TokenService tokenService;
 
-    public VisitController(UserService userService, PermissionService permissionService, KeyService keyService, RoleService roleService) {
+    public VisitController(UserService userService, PermissionService permissionService, KeyService keyService, RoleService roleService, TokenService tokenService) {
         this.userService = userService;
         this.permissionService = permissionService;
         this.keyService = keyService;
         this.roleService = roleService;
+        this.tokenService = tokenService;
     }
 
     @PreAuthorize("hasAnyAuthority('Visitante')")
-    @GetMapping("/myPermissions/{userId}")
-    public ResponseEntity<GeneralResponse> getMyPermissions(@PathVariable UUID userId) {
+    @GetMapping("/myPermissions")
+    public ResponseEntity<GeneralResponse> getMyPermissions(@RequestHeader("Authorization") String bearerToken) {
 
-        // TODO: ver si solo mandar la data necesaria para mostrar en el permiso asi como el uuid
-        User user = userService.getUser(userId);
+        String token = bearerToken.substring(7);
+        Token tokenEntity = tokenService.findTokenBycontent(token);
+
+        User user = userService.findUserByToken(tokenEntity);
 
         if(user == null) {
             return new ResponseEntity<>(
@@ -69,21 +68,26 @@ public class VisitController {
 
     @PreAuthorize("hasAnyAuthority('Visitante', 'Encargado', 'Residente')")// al momento que se le da generarQR
     @PostMapping("/validatePermission")
-    public ResponseEntity<GeneralResponse> validatePermission(@RequestBody @Valid ValidatePermissionDTO Data) {
+    public ResponseEntity<GeneralResponse> validatePermission(@RequestHeader("Authorization") String bearerToken, @RequestBody @Valid ValidatePermissionDTO Data) {
 
-        Role rolUser = roleService.getRoleByName(Data.getRole());
+        String token = bearerToken.substring(7);
+        Token tokenEntity = tokenService.findTokenBycontent(token);
 
-        if(rolUser == null) {
+        User user = userService.findUserByToken(tokenEntity);
+
+        if(user == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Role not found")
+                            .message("User not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
         }
 
         // si el rol es de visitante
-        if(rolUser.getRol().equals("Visitante")) {
+        Role residenteRol = roleService.getRoleByName("Residente");
+
+        if(!user.getRolId().contains(residenteRol)) {
 
             Permission permission = permissionService.getPermission(Data.getPermissionId());
 
@@ -97,7 +101,8 @@ public class VisitController {
             }
 
             // busco la llave que corresponde al permiso para actualizar sus campos
-            Key key = permission.getKeyId();
+            UUID keyId = permission.getKeyId().getKeyId();
+            Key key = keyService.getKey(keyId);
 
             KeyUpdateDTO keyData = new KeyUpdateDTO();
             keyData.setGenerationDate(Data.getGenerationDate());
@@ -106,29 +111,46 @@ public class VisitController {
 
             keyService.updateKey(key, keyData);// el dto trae la informacion del momento en que se hizo la peticion
 
+            // obtengo la llave otra vez para tener los cambios actualizados
+            Key keyUpdated = keyService.getKey(keyId);
+
             // valido el permiso con respecto de la llave
 
-            // si la llave no es valida, se cambia el valor de valid y active del permiso a false
+            // validar si la llave es apta para usarse en ese momento
             if(!permissionService.validatePermission(permission, key)) {
 
-                permissionService.changePermissionValidationStatus(permission, false);
-                permissionService.deletePermission(permission);
+                // si no lo es, validar si el permiso ya no es valido o si se trata de una entrada en un momento no permitido
+                if(!permissionService.validateTimeOfPermission(permission)) {
 
+                    // si la llave no es valida, se cambia el valor de valid y active del permiso a false
+                    permissionService.changePermissionValidationStatus(permission, false);
+                    permissionService.deletePermission(permission);
+
+                    return new ResponseEntity<>(
+                            new GeneralResponse.Builder()
+                                    .message("Permission is not valid anymore")// el permiso ya no es valido y deberia refrescarse la data en front
+                                    .build(),
+                            HttpStatus.BAD_REQUEST
+                    );
+                }
+                // si no entra al if, es por que el permiso aun es valido pero quiere entrar en un momento no permitido
                 return new ResponseEntity<>(
                         new GeneralResponse.Builder()
-                                .message("Permission is not valid anymore")// el permiso ya no es valido y deberia refrescarse la data en front
+                                .message("Permission is valid but not in the right time")
                                 .build(),
                         HttpStatus.BAD_REQUEST
                 );
+
             }
 
             /*
-            * El QR debe generarse a partir de los campos de la llave y el nombre del rol
+            * El QR debe generarse a partir de los campos de la llave (contando id) y el nombre del rol
             * */
+
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
                             .message("Permission is still valid for visitor")
-                            .data(key)// retorno la llave para que se genere el QR
+                            .data(keyUpdated)// retorno la llave para que se genere el QR
                             .build(),
                     HttpStatus.OK
             );
@@ -136,15 +158,55 @@ public class VisitController {
         }
 
         // si el rol es de encargado o residente se crea una nueva llave para generar el permiso
-        // el QR debe generarse con el id de la llave y el id del rol
+        // el QR debe generarse con el id de la llave y el id del rol, y la data de la llave
 
         // se crea una nueva llave
         Key key = new Key();
+        key.setKeyId(UUID.randomUUID());
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Permission valid for resident or manager")
                         .data(key)
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
+    @PreAuthorize("hasAnyAuthority('Visitante')")
+    @PostMapping("/completeRegister")
+    public ResponseEntity<GeneralResponse> addDuiAndPhone(@RequestHeader("Authorization") String bearerToken, @RequestBody @Valid RegisterDuiAndPhoneDTO data){
+
+        // buscar el usuario por el token
+        String token = bearerToken.substring(7);
+        Token tokenEntity = tokenService.findTokenBycontent(token);
+
+        if(tokenEntity == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Token not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        User user = userService.findUserByToken(tokenEntity);
+
+        if(user == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("User not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        // agregar el dui y el telefono al usuario
+        userService.setDuiAndPhoneToUser(user, data.getDui(), data.getPhone());
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Dui and phone added successfully")
                         .build(),
                 HttpStatus.OK
         );

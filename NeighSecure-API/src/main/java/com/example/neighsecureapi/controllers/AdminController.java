@@ -24,7 +24,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -192,15 +195,25 @@ public class AdminController {
 
         DashboardAdmDTO dashboard = new DashboardAdmDTO();
 
-        // envia los usuarios para poder hacer las graficas
-        dashboard.setUsers(userService.getAllUsers());
 
         // envia las entradas para poder hacer las graficas
         dashboard.setEntries(entryService.getAllEntries());
 
-        // contar cuantos usuarios y casas hay
-        dashboard.setTotalUsers(dashboard.getUsers().size());
+        // contar cuantos casas hay
         dashboard.setTotalHomes(homeService.getAllHomes().size());
+
+        // contar cuantos residentes hay
+        Role residentRole = roleService.getRoleByName("Residente");
+        dashboard.setTotalResidents(userService.getAllUsersByRole(residentRole).size());
+
+        // contar cuantos visitantes de hoy hay, contando cuantas entradas hubo el dia de hoy
+        // Obtén la fecha actual como LocalDate
+        LocalDate localDate = LocalDate.now();
+
+        // Convierte LocalDate a Date
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        dashboard.setTotalVisitorsToday(entryService.getAllEntriesByDate(date).size());
 
         // envia el dto con la data necesaria para la vista
         return new ResponseEntity<>(

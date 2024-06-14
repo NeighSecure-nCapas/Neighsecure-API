@@ -2,15 +2,17 @@ package com.example.neighsecureapi.domain.dtos.permissionDTOs;
 
 import lombok.Data;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Data
 public class PermissionDTO {
     private String type;
-    private Date startDate;
-    private Date endDate;
-    private Date startTime;
-    private Date endTime;
+    private LocalDate startDate;
+    private LocalDate endDate;
+    private LocalTime startTime;
+    private LocalTime endTime;
     private Boolean status;
     private boolean valid;
     private Date generationDate;

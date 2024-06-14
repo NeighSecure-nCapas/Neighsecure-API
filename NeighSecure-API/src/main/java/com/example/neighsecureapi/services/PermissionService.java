@@ -40,6 +40,7 @@ public interface PermissionService {
     // TODO: validar la relacion entre llave y permiso, puede q el id del permiso vaya en la tabla de llave y no al revez
     public boolean validatePermission(Permission permission, Key key);
     public boolean validateDayOfPermission(Permission permission, Key key);
+    public boolean validateTimeOfPermission(Permission permission);
 
     public Permission findPermissionByKeyId(Key keyId);
 

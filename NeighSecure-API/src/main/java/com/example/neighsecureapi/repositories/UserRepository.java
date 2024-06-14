@@ -1,5 +1,6 @@
 package com.example.neighsecureapi.repositories;
 
+import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.Token;
 import com.example.neighsecureapi.domain.entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findUserByNameAndActiveIsTrue(String name);
     Optional<User> findByEmailOrDuiOrNameAndActiveIsTrue(String email, String dui, String name);
     Optional<User> findByTokens(List<Token> tokens);
+    List<User> findAllByRolId(List<Role> rolId);
 }

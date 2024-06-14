@@ -1,5 +1,6 @@
 package com.example.neighsecureapi.domain.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,5 +24,6 @@ public class Terminal {
     private String entryType; // podria ser un enum (? peatonal o vehicular
 
     @OneToMany(mappedBy = "terminalId", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Entry> entries;
 }

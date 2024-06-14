@@ -139,7 +139,7 @@ public class HomeBossController {
     // <OBTENER TODOS LOS PERMISOS DE LA CASA EN CONTROLADOR DE RESIDENTE>
 
     @PreAuthorize("hasAnyAuthority('Encargado', 'Residente')")
-    @GetMapping("permissions/{permissionId}")
+    @GetMapping("/permissions/{permissionId}")
     public ResponseEntity<GeneralResponse> getPermission(@PathVariable UUID permissionId) {
 
         Permission permission = permissionService.getPermission(permissionId);
@@ -233,9 +233,10 @@ public class HomeBossController {
             );
         }
 
-        // cambiar estado a rechazado (false) y a invalido (false)
+        // cambiar estado a rechazado (false) y a invalido (false) y eliminarlo (active false)
         permissionService.changePermissionPendingStatus(permission, false);
         permissionService.changePermissionValidationStatus(permission, false);
+        permissionService.deletePermission(permission);
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
@@ -245,38 +246,5 @@ public class HomeBossController {
         );
     }
 
-    @PreAuthorize("hasAuthority('Encargado')")// TODO:  validar si solo el encargado puede eliminar permisos
-    @PatchMapping("/permissions/delete/{permissionId}")
-    public ResponseEntity<GeneralResponse> deletePermission(@PathVariable UUID permissionId) {
-
-        Permission permission = permissionService.getPermission(permissionId);
-
-        if(permission == null) {
-            return new ResponseEntity<>(
-                    new GeneralResponse.Builder()
-                            .message("Permission not found")
-                            .build(),
-                    HttpStatus.NOT_FOUND
-            );
-        }
-
-        if(!permission.isActive()){
-            return new ResponseEntity<>(
-                    new GeneralResponse.Builder()
-                            .message("Permission is not active")
-                            .build(),
-                    HttpStatus.BAD_REQUEST
-            );
-        }
-
-        permissionService.deletePermission(permission);
-
-        return new ResponseEntity<>(
-                new GeneralResponse.Builder()
-                        .message("Permission deleted successfully")
-                        .build(),
-                HttpStatus.OK
-        );
-    }
 
 }

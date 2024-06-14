@@ -38,7 +38,6 @@ public class User implements UserDetails {
     @Column(name = "telefono")
     private String phone;
 
-    // TODO: ver como agregar varios roles
     @Column(name = "rolId")
     @JsonManagedReference
     @ManyToMany(fetch = FetchType.LAZY)
@@ -63,10 +62,9 @@ public class User implements UserDetails {
     @Column(name = "estadoUser")
     private Boolean active;
 
-    @JsonManagedReference
-    @OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
-    //@JsonIgnore
-    private List<Permission> permissions;
+    //@JsonManagedReference
+    //@OneToMany(mappedBy = "userId", fetch = FetchType.LAZY)
+    //private List<Permission> permissions;
 
     // jwt things
     // TODO: ver si hay q cambiar todas las cuestiones afines a la variable status

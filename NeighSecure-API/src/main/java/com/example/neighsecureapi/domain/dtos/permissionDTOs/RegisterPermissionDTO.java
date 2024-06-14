@@ -1,10 +1,13 @@
 package com.example.neighsecureapi.domain.dtos.permissionDTOs;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -13,21 +16,21 @@ public class RegisterPermissionDTO {
     @NotBlank
     private String type;
 
-    @NotBlank
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date startDate;
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    private LocalDate startDate;
 
-    @NotBlank
-    @DateTimeFormat(pattern = "dd/MM/yyyy")
-    private Date endDate;
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    private LocalDate endDate;
 
-    @NotBlank
-    @DateTimeFormat(pattern = "HH:mm")
-    private Date startTime;
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private LocalTime startTime;
 
-    @NotBlank
-    @DateTimeFormat(pattern = "HH:mm")
-    private Date endTime;
+    @NotNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
+    private LocalTime endTime;
 
     @NotBlank
     private String days;
