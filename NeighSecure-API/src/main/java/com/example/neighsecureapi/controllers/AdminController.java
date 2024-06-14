@@ -539,10 +539,18 @@ public class AdminController {
 
             entryFormat.setId(entry.getId());
             entryFormat.setDate(entry.getEntryDate());
-            entryFormat.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
-            entryFormat.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
-            entryFormat.setEntryType(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
+            entryFormat.setEntryTypeTerminal(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
 
+            // validar si el permiso existe
+            if(entry.getPermissionId() != null) {
+                entryFormat.setEntryType(permissionService.getPermission(entry.getPermissionId().getId()).getType());
+                entryFormat.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+                entryFormat.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+            } else {
+                entryFormat.setEntryType("Anonima");
+                entryFormat.setUser("-");
+                entryFormat.setHomeNumber(0);// no hay permiso, por tanto es anonima
+            }
 
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
