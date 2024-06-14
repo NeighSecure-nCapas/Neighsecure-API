@@ -2,6 +2,7 @@ package com.example.neighsecureapi.controllers;
 
 
 import com.example.neighsecureapi.domain.dtos.entryDTOs.PresentationEntryDTO;
+import com.example.neighsecureapi.domain.dtos.entryDTOs.PresentationEntryDetailsDTO;
 import com.example.neighsecureapi.domain.dtos.homeDTOs.*;
 import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryBoardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
@@ -206,8 +207,43 @@ public class AdminController {
         DashboardAdmDTO dashboard = new DashboardAdmDTO();
 
 
-        // envia las entradas para poder hacer las graficas
-        dashboard.setEntries(entryService.getAllEntries());
+        // envia las entradas para poder hacer las graficas, seteados con el formato necesario
+        List<PresentationEntryDetailsDTO> entries = entryService.getAllEntries()
+                .stream().map(entry -> {
+                    PresentationEntryDetailsDTO entryDTO = new PresentationEntryDetailsDTO();
+                    entryDTO.setId(entry.getId());
+                    entryDTO.setDate(entry.getEntryDate());
+
+                    // validar si el permiso existe
+                    if(entry.getPermissionId() != null) {
+                        // si el permiso existe, entonces se obtiene el tipo de entrada del permiso
+                        entryDTO.setEntryType(permissionService.getPermission(entry.getPermissionId().getId()).getType());
+
+                        // se obtiene el usuario y la casa del permiso con el formato necesario
+                        PresentationUserDetailsDTO user = new PresentationUserDetailsDTO();
+                        user.setId(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getId());
+                        user.setName(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+                        user.setEmail(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getEmail());
+                        user.setPhoneNumber(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getPhone());
+                        user.setRoles(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getRolId());
+                        entryDTO.setUser(user);
+
+                        PresentationHomeDTO home = new PresentationHomeDTO();
+                        home.setId(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getId());
+                        home.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+                        home.setHomeBoss(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeOwnerId().getName());
+                        entryDTO.setHome(home);
+                    } else {
+                        // si el permiso no existe, entonces la entrada es anonima
+                        entryDTO.setUser(null);
+                        entryDTO.setEntryType("Anonima");
+                        entryDTO.setHome(null);// no hay permiso, por tanto es anonima
+                    }
+
+                    return entryDTO;
+                }).toList();
+
+        dashboard.setEntries(entries);
 
         // contar cuantos casas hay
         dashboard.setTotalHomes(homeService.getAllHomes().size());

@@ -1,5 +1,6 @@
 package com.example.neighsecureapi.domain.dtos.userDTOs;
 
+import com.example.neighsecureapi.domain.dtos.entryDTOs.PresentationEntryDetailsDTO;
 import com.example.neighsecureapi.domain.entities.Entry;
 import com.example.neighsecureapi.domain.entities.User;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,6 @@ public class DashboardAdmDTO {
     int totalVisitorsToday;
     int totalHomes;
 
-    List<Entry> entries;
+    List<PresentationEntryDetailsDTO> entries;
 
 }
