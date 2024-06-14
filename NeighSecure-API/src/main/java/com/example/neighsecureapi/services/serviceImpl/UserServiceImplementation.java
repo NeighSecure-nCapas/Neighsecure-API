@@ -146,6 +146,11 @@ public class UserServiceImplementation implements UserService {
         return userRepository.findByTokens(List.of(token)).orElse(null);
     }
 
+    @Override
+    public List<User> getAllUsersByRole(Role rol) {
+        return userRepository.findAllByRolId(List.of(rol));
+    }
+
     // TOKEN -----------------------------------------------------------------------
 
     @Override

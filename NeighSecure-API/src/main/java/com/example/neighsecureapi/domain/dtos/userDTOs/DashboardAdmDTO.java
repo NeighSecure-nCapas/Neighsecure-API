@@ -12,9 +12,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DashboardAdmDTO {
-    int totalUsers;
+    int totalResidents;
+    int totalVisitorsToday;
     int totalHomes;
-    List<User> users;
 
     List<Entry> entries;
 

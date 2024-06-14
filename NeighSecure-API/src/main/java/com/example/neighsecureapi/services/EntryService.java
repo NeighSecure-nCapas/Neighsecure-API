@@ -5,6 +5,7 @@ import com.example.neighsecureapi.domain.entities.Entry;
 import com.example.neighsecureapi.domain.entities.Permission;
 import com.example.neighsecureapi.domain.entities.Terminal;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +18,8 @@ public interface EntryService {
     public Entry getEntry(UUID entryId);
 
     public List<Entry> getAllEntries();
+
+    public List<Entry> getAllEntriesByDate(Date date);
 
     // END OF CRUD IMPLEMENTATION ---------------------------------------------------------------------
 
