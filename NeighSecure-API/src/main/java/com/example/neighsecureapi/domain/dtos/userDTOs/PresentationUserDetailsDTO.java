@@ -1,27 +1,23 @@
 package com.example.neighsecureapi.domain.dtos.userDTOs;
 
 import com.example.neighsecureapi.domain.entities.Role;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
 import java.util.UUID;
 
 @Data
-public class WhoAmIDTO {
+public class PresentationUserDetailsDTO {
 
-    private UUID userId;
+    private UUID id;
 
-    private String username;
+    private String name;
 
     private String email;
 
-    private List<Role> roles;
+    private String dui;
 
     private String phoneNumber;
 
-    private String dui;
-
-    private UUID homeId;
+    private List<Role> roles;
 }

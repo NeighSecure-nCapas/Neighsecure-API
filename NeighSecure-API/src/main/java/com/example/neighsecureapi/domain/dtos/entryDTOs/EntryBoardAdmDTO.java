@@ -21,5 +21,7 @@ public class EntryBoardAdmDTO {
     private Integer homeNumber;
 
     @NotBlank
+    private String entryTypeTerminal;
+
     private String entryType;
 }

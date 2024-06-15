@@ -1,12 +1,13 @@
 package com.example.neighsecureapi.controllers;
 
 
-import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeFullDataDTO;
-import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDataDTO;
+import com.example.neighsecureapi.domain.dtos.entryDTOs.PresentationEntryDTO;
+import com.example.neighsecureapi.domain.dtos.entryDTOs.PresentationEntryDetailsDTO;
+import com.example.neighsecureapi.domain.dtos.homeDTOs.*;
 import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryBoardAdmDTO;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
-import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.DashboardAdmDTO;
+import com.example.neighsecureapi.domain.dtos.userDTOs.PresentationUserDetailsDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.RoleUpdateDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.UserResponseDTO;
 import com.example.neighsecureapi.domain.entities.Entry;
@@ -81,7 +82,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuarios obtenidos con exito")
+                        .message("Users obtained successfully")
                         .data(users)
                         .build(),
                 HttpStatus.OK
@@ -97,18 +98,24 @@ public class AdminController {
         if(user == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Usuario no encontrado")
+                            .message("User not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
         }
 
-        // TODO: presentationDTO
+        PresentationUserDetailsDTO userP = new PresentationUserDetailsDTO();
+        userP.setId(user.getId());
+        userP.setName(user.getName());
+        userP.setEmail(user.getEmail());
+        userP.setDui(user.getDui());
+        userP.setPhoneNumber(user.getPhone());
+        userP.setRoles(user.getRolId());
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuarios obtenidos con exito")
-                        .data(user)
+                        .message("User obtained successfully")
+                        .data(userP)
                         .build(),
                 HttpStatus.OK
         );
@@ -123,7 +130,7 @@ public class AdminController {
         if(user == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Usuario no encontrado")
+                            .message("User not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
@@ -134,7 +141,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuario eliminado con exito")
+                        .message("User deleted successfully")
                         .build(),
                 HttpStatus.OK
         );
@@ -154,7 +161,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuarios obtenidos con exito")
+                        .message("Users obtained successfully")
                         .data(users)
                         .build(),
                 HttpStatus.OK
@@ -170,18 +177,23 @@ public class AdminController {
         if(user == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Usuario no encontrado")
+                            .message("User not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
         }
 
-        // TODO: presentationDTO
+        PresentationUserDetailsDTO userP = new PresentationUserDetailsDTO();
+        userP.setId(user.getId());
+        userP.setName(user.getName());
+        userP.setEmail(user.getEmail());
+        userP.setPhoneNumber(user.getPhone());
+        userP.setRoles(user.getRolId());
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuarios obtenidos con exito")
-                        .data(user)
+                        .message("User obtained successfully")
+                        .data(userP)
                         .build(),
                 HttpStatus.OK
         );
@@ -196,8 +208,43 @@ public class AdminController {
         DashboardAdmDTO dashboard = new DashboardAdmDTO();
 
 
-        // envia las entradas para poder hacer las graficas
-        dashboard.setEntries(entryService.getAllEntries());
+        // envia las entradas para poder hacer las graficas, seteados con el formato necesario
+        List<PresentationEntryDetailsDTO> entries = entryService.getAllEntries()
+                .stream().map(entry -> {
+                    PresentationEntryDetailsDTO entryDTO = new PresentationEntryDetailsDTO();
+                    entryDTO.setId(entry.getId());
+                    entryDTO.setDate(entry.getEntryDate());
+
+                    // validar si el permiso existe
+                    if(entry.getPermissionId() != null) {
+                        // si el permiso existe, entonces se obtiene el tipo de entrada del permiso
+                        entryDTO.setEntryType(permissionService.getPermission(entry.getPermissionId().getId()).getType());
+
+                        // se obtiene el usuario y la casa del permiso con el formato necesario
+                        PresentationUserDetailsDTO user = new PresentationUserDetailsDTO();
+                        user.setId(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getId());
+                        user.setName(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+                        user.setEmail(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getEmail());
+                        user.setPhoneNumber(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getPhone());
+                        user.setRoles(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getRolId());
+                        entryDTO.setUser(user);
+
+                        PresentationHomeDTO home = new PresentationHomeDTO();
+                        home.setId(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getId());
+                        home.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+                        home.setHomeBoss(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeOwnerId().getName());
+                        entryDTO.setHome(home);
+                    } else {
+                        // si el permiso no existe, entonces la entrada es anonima
+                        entryDTO.setUser(null);
+                        entryDTO.setEntryType("Anonima");
+                        entryDTO.setHome(null);// no hay permiso, por tanto es anonima
+                    }
+
+                    return entryDTO;
+                }).toList();
+
+        dashboard.setEntries(entries);
 
         // contar cuantos casas hay
         dashboard.setTotalHomes(homeService.getAllHomes().size());
@@ -218,7 +265,7 @@ public class AdminController {
         // envia el dto con la data necesaria para la vista
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Dashboard obtenido con exito")
+                        .message("Dashboard obtained successfully")
                         .data(dashboard)
                         .build(),
                 HttpStatus.OK
@@ -231,10 +278,22 @@ public class AdminController {
     @GetMapping("/homes")
     public ResponseEntity<GeneralResponse> getAllHomes() {
 
+        List<Home> homes = homeService.getAllHomes();
+
+        // se mapea la lista de casas a un dto para no enviar la data sensible
+        List<PresentationHomeDTO> homesDTO = homes
+                .stream().map(home -> {
+                    PresentationHomeDTO homeDTO = new PresentationHomeDTO();
+                    homeDTO.setId(home.getId());
+                    homeDTO.setHomeNumber(home.getHomeNumber());
+                    homeDTO.setHomeBoss(home.getHomeOwnerId().getName());
+                    return homeDTO;
+                }).toList();
+
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casas obtenidas con exito")
-                        .data(homeService.getAllHomes())
+                        .message("Homes obtained successfully")
+                        .data(homesDTO)
                         .build(),
                 HttpStatus.OK
         );
@@ -249,23 +308,50 @@ public class AdminController {
         if(home == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Casa no encontrada")
+                            .message("Home not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
         }
 
-        HomeFullDataDTO homeFullDataDTO = new HomeFullDataDTO();
+//        HomeFullDataDTO homeFullDataDTO = new HomeFullDataDTO();
+//        homeFullDataDTO.setId(home.getId());
+//        homeFullDataDTO.setHomeNumber(home.getHomeNumber());
+//        homeFullDataDTO.setAddress(home.getAddress());
+//        homeFullDataDTO.setMembersNumber(home.getMembersNumber());
+//        homeFullDataDTO.setUserAdmin(home.getHomeOwnerId());
+//        homeFullDataDTO.setHomeMembers(home.getHomeMemberId());
+
+        PresentationHomeDetailDTO homeFullDataDTO = new PresentationHomeDetailDTO();
         homeFullDataDTO.setId(home.getId());
         homeFullDataDTO.setHomeNumber(home.getHomeNumber());
-        homeFullDataDTO.setAddress(home.getAddress());
         homeFullDataDTO.setMembersNumber(home.getMembersNumber());
-        homeFullDataDTO.setUserAdmin(home.getHomeOwnerId());
-        homeFullDataDTO.setHomeMembers(home.getHomeMemberId());
+
+        // setear el jefe de la casa
+        PresentationUserDetailsDTO homeBoss = new PresentationUserDetailsDTO();
+        homeBoss.setId(home.getHomeOwnerId().getId());
+        homeBoss.setName(home.getHomeOwnerId().getName());
+        homeBoss.setEmail(home.getHomeOwnerId().getEmail());
+        homeBoss.setPhoneNumber(home.getHomeOwnerId().getPhone());
+        homeBoss.setRoles(home.getHomeOwnerId().getRolId());
+        homeFullDataDTO.setHomeBoss(homeBoss);
+
+        // setear los miembros de la casa
+        List<PresentationUserDetailsDTO> homeMembers = new ArrayList<>();
+        for(User member : home.getHomeMemberId()) {
+            PresentationUserDetailsDTO memberDTO = new PresentationUserDetailsDTO();
+            memberDTO.setId(member.getId());
+            memberDTO.setName(member.getName());
+            memberDTO.setEmail(member.getEmail());
+            memberDTO.setPhoneNumber(member.getPhone());
+            memberDTO.setRoles(member.getRolId());
+            homeMembers.add(memberDTO);
+        }
+        homeFullDataDTO.setMembers(homeMembers);
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casa obtenida con exito")
+                        .message("Home obtained successfully")
                         .data(homeFullDataDTO)
                         .build(),
                 HttpStatus.OK
@@ -281,7 +367,7 @@ public class AdminController {
         if(home != null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("La casa ya esta registrada")
+                            .message("Home is already registered")
                             .build(),
                     HttpStatus.BAD_REQUEST
             );
@@ -325,7 +411,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casa registrada con exito")
+                        .message("Home registered successfully")
                         .build(),
                 HttpStatus.CREATED
         );
@@ -340,7 +426,7 @@ public class AdminController {
         if(home == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Casa no encontrada")
+                            .message("Home not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
@@ -390,7 +476,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casa actualizada con exito")
+                        .message("Home updated successfully")
                         .build(),
                 HttpStatus.OK
         );
@@ -405,7 +491,7 @@ public class AdminController {
         if(home == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Casa no encontrada")
+                            .message("Home not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
@@ -415,7 +501,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casa eliminada con exito")
+                        .message("Home deleted successfully")
                         .build(),
                 HttpStatus.OK
         );
@@ -428,21 +514,41 @@ public class AdminController {
 
         // se mapea la lista de entradas a un dto para no enviar la data sensible y dar formato
 
-        List<EntryBoardAdmDTO> entries = entryService.getAllEntries()
+//        List<EntryBoardAdmDTO> entries = entryService.getAllEntries()
+//                .stream().map(entry -> {
+//                    EntryBoardAdmDTO entryBoardAdmDTO = new EntryBoardAdmDTO();
+//                    entryBoardAdmDTO.setId(entry.getId());
+//                    entryBoardAdmDTO.setDate(entry.getEntryDate());
+//                    entryBoardAdmDTO.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+//                    entryBoardAdmDTO.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+//                    entryBoardAdmDTO.setEntryType(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
+//                    return entryBoardAdmDTO;
+//                }).toList();
+
+        List<PresentationEntryDTO> entries = entryService.getAllEntries()
                 .stream().map(entry -> {
-                    EntryBoardAdmDTO entryBoardAdmDTO = new EntryBoardAdmDTO();
-                    entryBoardAdmDTO.setId(entry.getId());
-                    entryBoardAdmDTO.setDate(entry.getEntryDate());
-                    entryBoardAdmDTO.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
-                    entryBoardAdmDTO.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
-                    entryBoardAdmDTO.setEntryType(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
-                    return entryBoardAdmDTO;
+                    PresentationEntryDTO entryDTO = new PresentationEntryDTO();
+                    entryDTO.setId(entry.getId());
+                    entryDTO.setDate(entry.getEntryDate());
+
+                    // validar si el permiso existe
+                    if(entry.getPermissionId() != null) {
+                        entryDTO.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+                        entryDTO.setEntryType(entry.getPermissionId().getType());
+                        entryDTO.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+                    } else {
+                        entryDTO.setUser("-");
+                        entryDTO.setEntryType("Anonima");
+                        entryDTO.setHomeNumber(0);// no hay permiso, por tanto es anonima
+                    }
+
+                    return entryDTO;
                 }).toList();
 
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Entradas obtenidas con exito")
+                        .message("Entries obtained successfully")
                         .data(entries)
                         .build(),
                 HttpStatus.OK
@@ -460,7 +566,7 @@ public class AdminController {
             if(entry == null) {
                 return new ResponseEntity<>(
                         new GeneralResponse.Builder()
-                                .message("Entrada no encontrada")
+                                .message("Entry not found")
                                 .build(),
                         HttpStatus.NOT_FOUND
                 );
@@ -470,14 +576,22 @@ public class AdminController {
 
             entryFormat.setId(entry.getId());
             entryFormat.setDate(entry.getEntryDate());
-            entryFormat.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
-            entryFormat.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
-            entryFormat.setEntryType(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
+            entryFormat.setEntryTypeTerminal(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
 
+            // validar si el permiso existe
+            if(entry.getPermissionId() != null) {
+                entryFormat.setEntryType(permissionService.getPermission(entry.getPermissionId().getId()).getType());
+                entryFormat.setUser(userService.getUser(permissionService.getPermission(entry.getPermissionId().getId()).getUserId().getId()).getName());
+                entryFormat.setHomeNumber(homeService.getHome(permissionService.getPermission(entry.getPermissionId().getId()).getHomeId().getId()).getHomeNumber());
+            } else {
+                entryFormat.setEntryType("Anonima");
+                entryFormat.setUser("-");
+                entryFormat.setHomeNumber(0);// no hay permiso, por tanto es anonima
+            }
 
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Entrada obtenida con exito")
+                            .message("Entry obtained successfully")
                             .data(entryFormat)
                             .build(),
                     HttpStatus.OK
@@ -493,7 +607,7 @@ public class AdminController {
             if(entry == null) {
                 return new ResponseEntity<>(
                         new GeneralResponse.Builder()
-                                .message("Entrada no encontrada")
+                                .message("Entry not found")
                                 .build(),
                         HttpStatus.NOT_FOUND
                 );
@@ -503,7 +617,7 @@ public class AdminController {
 
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Entrada eliminada con exito")
+                            .message("Entry deleted successfully")
                             .build(),
                     HttpStatus.OK
             );
