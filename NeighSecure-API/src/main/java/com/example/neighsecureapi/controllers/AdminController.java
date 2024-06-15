@@ -108,6 +108,7 @@ public class AdminController {
         userP.setId(user.getId());
         userP.setName(user.getName());
         userP.setEmail(user.getEmail());
+        userP.setDui(user.getDui());
         userP.setPhoneNumber(user.getPhone());
         userP.setRoles(user.getRolId());
 

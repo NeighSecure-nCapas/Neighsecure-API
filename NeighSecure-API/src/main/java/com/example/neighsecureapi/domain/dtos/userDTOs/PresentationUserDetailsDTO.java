@@ -15,6 +15,8 @@ public class PresentationUserDetailsDTO {
 
     private String email;
 
+    private String dui;
+
     private String phoneNumber;
 
     private List<Role> roles;

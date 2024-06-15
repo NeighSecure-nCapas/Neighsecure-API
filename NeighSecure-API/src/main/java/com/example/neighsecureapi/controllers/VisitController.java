@@ -2,8 +2,10 @@ package com.example.neighsecureapi.controllers;
 
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.KeyUpdateDTO;
+import com.example.neighsecureapi.domain.dtos.permissionDTOs.PresentationPermissionDTO;
 import com.example.neighsecureapi.domain.dtos.permissionDTOs.ValidatePermissionDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterDuiAndPhoneDTO;
+import com.example.neighsecureapi.domain.dtos.userDTOs.UserResponseDTO;
 import com.example.neighsecureapi.domain.entities.*;
 import com.example.neighsecureapi.services.*;
 import jakarta.validation.Valid;
@@ -59,10 +61,54 @@ public class VisitController {
         // la funcion ya devuelve los permisos aprobados y que aun son validos
         List<Permission> permissions = permissionService.getPermissionsByUser(user);
 
+        // implementar dtod e presentacion para retornar solo los datos necesarios
+        List<PresentationPermissionDTO> permissionsDTO = permissions.stream()
+                .filter(permission -> permission.getUserAuth() != null && permission.getStartDate() != null && permission.getEndDate() != null)
+                .map(permission -> {
+                    PresentationPermissionDTO permissionDTO = new PresentationPermissionDTO();
+                    permissionDTO.setId(permission.getId());
+                    permissionDTO.setType(permission.getType());
+                    permissionDTO.setStartDate(permission.getStartDate());
+                    permissionDTO.setEndDate(permission.getEndDate());
+                    permissionDTO.setStartTime(permission.getStartTime());
+                    permissionDTO.setEndTime(permission.getEndTime());
+                    permissionDTO.setGenerationDate(permission.getGenerationDate());
+                    permissionDTO.setDays(permission.getDays());
+                    permissionDTO.setHomeId(permission.getHomeId().getId());
+                    permissionDTO.setHomeNumber(permission.getHomeId().getHomeNumber());
+                    permissionDTO.setAddress(permission.getHomeId().getAddress());
+                    permissionDTO.setStatus(permission.getStatus());
+                    permissionDTO.setValid(permission.isValid());
+
+                    // generar dto de presentacion del userAuth
+                    UserResponseDTO userAuthDTO = new UserResponseDTO();
+                    userAuthDTO.setId(permission.getUserAuth().getId());
+                    userAuthDTO.setName(permission.getUserAuth().getName());
+                    userAuthDTO.setDui(permission.getUserAuth().getDui());
+                    userAuthDTO.setEmail(permission.getUserAuth().getEmail());
+                    userAuthDTO.setPhone(permission.getUserAuth().getPhone());
+                    userAuthDTO.setHomeNumber(null);
+
+                    permissionDTO.setUserAuth(userAuthDTO);
+
+                    // generar dto de presentacion del userAssociated
+                    UserResponseDTO userAssociatedDTO = new UserResponseDTO();
+                    userAssociatedDTO.setId(permission.getUserId().getId());
+                    userAssociatedDTO.setName(permission.getUserId().getName());
+                    userAssociatedDTO.setDui(permission.getUserId().getDui());
+                    userAssociatedDTO.setEmail(permission.getUserId().getEmail());
+                    userAssociatedDTO.setPhone(permission.getUserId().getPhone());
+                    userAssociatedDTO.setHomeNumber(null);
+
+                    permissionDTO.setUserAssociated(userAssociatedDTO);
+
+                    return permissionDTO;
+                }).toList();
+
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Permissions obtained successfully")
-                        .data(permissions)
+                        .data(permissionsDTO)
                         .build(),
                 HttpStatus.OK
         );
