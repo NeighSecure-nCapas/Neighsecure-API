@@ -82,7 +82,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuarios obtenidos con exito")
+                        .message("Users obtained successfully")
                         .data(users)
                         .build(),
                 HttpStatus.OK
@@ -98,7 +98,7 @@ public class AdminController {
         if(user == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Usuario no encontrado")
+                            .message("User not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
@@ -114,7 +114,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuario obtenido con exito")
+                        .message("User obtained successfully")
                         .data(userP)
                         .build(),
                 HttpStatus.OK
@@ -130,7 +130,7 @@ public class AdminController {
         if(user == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Usuario no encontrado")
+                            .message("User not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
@@ -141,7 +141,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuario eliminado con exito")
+                        .message("User deleted successfully")
                         .build(),
                 HttpStatus.OK
         );
@@ -161,7 +161,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuarios obtenidos con exito")
+                        .message("Users obtained successfully")
                         .data(users)
                         .build(),
                 HttpStatus.OK
@@ -177,7 +177,7 @@ public class AdminController {
         if(user == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Usuario no encontrado")
+                            .message("User not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
@@ -192,7 +192,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuarios obtenidos con exito")
+                        .message("User obtained successfully")
                         .data(userP)
                         .build(),
                 HttpStatus.OK
@@ -265,7 +265,7 @@ public class AdminController {
         // envia el dto con la data necesaria para la vista
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Dashboard obtenido con exito")
+                        .message("Dashboard obtained successfully")
                         .data(dashboard)
                         .build(),
                 HttpStatus.OK
@@ -292,7 +292,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casas obtenidas con exito")
+                        .message("Homes obtained successfully")
                         .data(homesDTO)
                         .build(),
                 HttpStatus.OK
@@ -308,7 +308,7 @@ public class AdminController {
         if(home == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Casa no encontrada")
+                            .message("Home not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
@@ -351,7 +351,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casa obtenida con exito")
+                        .message("Home obtained successfully")
                         .data(homeFullDataDTO)
                         .build(),
                 HttpStatus.OK
@@ -367,7 +367,7 @@ public class AdminController {
         if(home != null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("La casa ya esta registrada")
+                            .message("Home is already registered")
                             .build(),
                     HttpStatus.BAD_REQUEST
             );
@@ -411,7 +411,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casa registrada con exito")
+                        .message("Home registered successfully")
                         .build(),
                 HttpStatus.CREATED
         );
@@ -426,7 +426,7 @@ public class AdminController {
         if(home == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Casa no encontrada")
+                            .message("Home not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
@@ -476,7 +476,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casa actualizada con exito")
+                        .message("Home updated successfully")
                         .build(),
                 HttpStatus.OK
         );
@@ -491,7 +491,7 @@ public class AdminController {
         if(home == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Casa no encontrada")
+                            .message("Home not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
@@ -501,7 +501,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Casa eliminada con exito")
+                        .message("Home deleted successfully")
                         .build(),
                 HttpStatus.OK
         );
@@ -548,7 +548,7 @@ public class AdminController {
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Entradas obtenidas con exito")
+                        .message("Entries obtained successfully")
                         .data(entries)
                         .build(),
                 HttpStatus.OK
@@ -566,7 +566,7 @@ public class AdminController {
             if(entry == null) {
                 return new ResponseEntity<>(
                         new GeneralResponse.Builder()
-                                .message("Entrada no encontrada")
+                                .message("Entry not found")
                                 .build(),
                         HttpStatus.NOT_FOUND
                 );
@@ -591,7 +591,7 @@ public class AdminController {
 
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Entrada obtenida con exito")
+                            .message("Entry obtained successfully")
                             .data(entryFormat)
                             .build(),
                     HttpStatus.OK
@@ -607,7 +607,7 @@ public class AdminController {
             if(entry == null) {
                 return new ResponseEntity<>(
                         new GeneralResponse.Builder()
-                                .message("Entrada no encontrada")
+                                .message("Entry not found")
                                 .build(),
                         HttpStatus.NOT_FOUND
                 );
@@ -617,7 +617,7 @@ public class AdminController {
 
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Entrada eliminada con exito")
+                            .message("Entry deleted successfully")
                             .build(),
                     HttpStatus.OK
             );
