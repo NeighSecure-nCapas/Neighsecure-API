@@ -8,10 +8,7 @@ import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.Token;
 import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.TokenRepository;
-import com.example.neighsecureapi.services.AuthService;
-import com.example.neighsecureapi.services.RoleService;
-import com.example.neighsecureapi.services.TokenService;
-import com.example.neighsecureapi.services.UserService;
+import com.example.neighsecureapi.services.*;
 import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +33,14 @@ public class AuthController {
     private final RoleService roleService;
     private final AuthService authService;
     private final TokenService tokenService;
+    private final HomeService homeService;
 
-    public AuthController(UserService userService, RoleService roleService, AuthService authService, TokenService tokenService) {
+    public AuthController(UserService userService, RoleService roleService, AuthService authService, TokenService tokenService, HomeService homeService) {
         this.userService = userService;
         this.roleService = roleService;
         this.authService = authService;
         this.tokenService = tokenService;
+        this.homeService = homeService;
     }
 
     @PostMapping("/register")
@@ -359,16 +358,30 @@ public class AuthController {
         if (user == null) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("Usuario no encontrado")
+                            .message("User not found")
                             .build(),
                     HttpStatus.NOT_FOUND
             );
         }
-        // TODO: implementar dto de presentación
+
+        // pasar la data a un DTO
+        WhoAmIDTO whoAmIDTO = new WhoAmIDTO();
+        whoAmIDTO.setUserId(user.getId());
+        whoAmIDTO.setUsername(user.getName());
+        whoAmIDTO.setEmail(user.getEmail());
+        whoAmIDTO.setRoles(user.getRolId());
+        whoAmIDTO.setPhoneNumber(user.getPhone());
+        whoAmIDTO.setDui(user.getDui());
+
+        // buscar la casa a la que pertenece
+        Home home = homeService.findHomeByUser(user);
+
+        whoAmIDTO.setHomeId(home.getId());
+
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
-                        .message("Usuario encontrado")
-                        .data(user)
+                        .message("User found")
+                        .data(whoAmIDTO)
                         .build(),
                 HttpStatus.OK
         );
