@@ -20,15 +20,22 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    // web
+    @Value("${spring.security.oauth2.client.registration.google-web-client.client-id}")
     private String clientId;
-    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    @Value("${spring.security.oauth2.client.registration.google-web-client.client-secret}")
     private String clientSecret;
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.google-web-client.redirect-uri}")
     private String redirectUri;
 
+    // mobile
+    @Value("${spring.security.oauth2.client.registration.google-mobile-client.client-id}")
+    private String mobileClientId;
+    @Value("${spring.security.oauth2.client.registration.google-mobile-client.redirect-uri}")
+    private String mobileRedirectUri;
+
     @Override
-    public Mono<String> exchangeCodeForAccessToken(String code) {
+    public Mono<String> exchangeCodeForAccessToken(String code, boolean isMobile) {
 
         log.info("Exchanging code for access token... {}", code);
         log.info("Redirect URI... {}", redirectUri);
@@ -40,9 +47,16 @@ public class AuthServiceImpl implements AuthService {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 
         formData.set("code", authorizationCode);
-        formData.set("client_id", clientId);
-        formData.set("client_secret", clientSecret);
-        formData.set("redirect_uri", redirectUri);
+        if (isMobile) {
+            formData.set("client_id", mobileClientId);
+            //formData.add("client_secret", clientSecret);
+            formData.set("redirect_uri", mobileRedirectUri);
+        } else {
+            formData.set("client_id", clientId);
+            formData.set("client_secret", clientSecret);
+            formData.set("redirect_uri", redirectUri);
+        }
+
         formData.set("grant_type", "authorization_code");
 
         log.info("Form data: {}", formData);

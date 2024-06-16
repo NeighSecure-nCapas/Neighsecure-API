@@ -256,10 +256,17 @@ public class AuthController {
 //                });
 //    }
 
-    @GetMapping("/google/redirect")
-    public Mono<ResponseEntity<GeneralResponse>> authenticateWithGoogleCode(@RequestParam("code") String authorizationCode) {
+    @GetMapping("/google/redirect/{device}")
+    public Mono<ResponseEntity<GeneralResponse>> authenticateWithGoogleCode(@RequestParam("code") String authorizationCode, @PathVariable("device") String device) {
         log.info("Authorization Code: {}", authorizationCode);
-        return authService.exchangeCodeForAccessToken(authorizationCode)
+
+        boolean isMobile = false;
+
+        if (device.equals("mobile")) {
+            isMobile = true;
+        }
+
+        return authService.exchangeCodeForAccessToken(authorizationCode, isMobile)
                 .flatMap(authService::fetchGoogleProfile)
                 .flatMap(googleUserInfo -> {
 
