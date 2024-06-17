@@ -48,10 +48,12 @@ public class AuthServiceImpl implements AuthService {
 
         formData.set("code", authorizationCode);
         if (isMobile) {
+            log.info("entro al de mobile");
             formData.set("client_id", mobileClientId);
             //formData.add("client_secret", clientSecret);
             formData.set("redirect_uri", mobileRedirectUri);
         } else {
+            log.info("no entro al de mobile");
             formData.set("client_id", clientId);
             formData.set("client_secret", clientSecret);
             formData.set("redirect_uri", redirectUri);
