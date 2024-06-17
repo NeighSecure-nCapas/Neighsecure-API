@@ -289,7 +289,7 @@ public class AuthController {
                         // despues de creado, se crea el token para inicar sesión y se retorna httpStatus created para identificar
                         User userRes = userService.findUserByEmail(email);
 
-                        log.info("User created, new user found{}", userRes);
+                        //log.info("User created, new user found{}", userRes);
                         try {
                             Token token = userService.registerToken(userRes);
                             return Mono.just(new ResponseEntity<>(
@@ -310,7 +310,7 @@ public class AuthController {
 
                     }
 
-                    log.info("User google info found, responding {}", user);
+                    //log.info("User google info found, responding {}", user);
                     // if user already exists, login
                     try {
                         Token token = userService.registerToken(user);
@@ -372,7 +372,7 @@ public class AuthController {
                         // despues de creado, se crea el token para inicar sesión y se retorna httpStatus created para identificar
                         User userRes = userService.findUserByEmail(email);
 
-                        log.info("User created, new user found{}", userRes);
+                        //log.info("User created, new user found{}", userRes);
                         try {
                             Token token = userService.registerToken(userRes);
                             return Mono.just(new ResponseEntity<>(
@@ -393,7 +393,7 @@ public class AuthController {
 
                     }
 
-                    log.info("User google info found, responding {}", user);
+                    //log.info("User google info found, responding {}", user);
                     // if user already exists, login
                     try {
                         Token token = userService.registerToken(user);
@@ -434,7 +434,7 @@ public class AuthController {
                     HttpStatus.UNAUTHORIZED
             );
         }
-
+        log.info("Bearer token: {}", bearerToken);
         String token = bearerToken.substring(7);
 
         Token tokenEntity = tokenService.findTokenBycontent(token);
@@ -462,7 +462,12 @@ public class AuthController {
         // buscar la casa a la que pertenece
         Home home = homeService.findHomeByUser(user);
 
-        whoAmIDTO.setHomeId(home.getId());
+        if(home != null) {
+            whoAmIDTO.setHomeId(home.getId());
+        }else{
+            whoAmIDTO.setHomeId(null);
+        }
+
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
