@@ -266,6 +266,8 @@ public class AuthController {
             isMobile = true;
         }
 
+        log.info(device);
+
         return authService.exchangeCodeForAccessToken(authorizationCode, isMobile)
                 .flatMap(authService::fetchGoogleProfile)
                 .flatMap(googleUserInfo -> {
