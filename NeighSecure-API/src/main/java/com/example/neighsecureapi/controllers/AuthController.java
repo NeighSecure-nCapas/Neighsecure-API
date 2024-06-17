@@ -429,6 +429,7 @@ public class AuthController {
         if (bearerToken == null || bearerToken.isEmpty()) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
+                            .message("No token provided")
                             .build(),
                     HttpStatus.UNAUTHORIZED
             );
