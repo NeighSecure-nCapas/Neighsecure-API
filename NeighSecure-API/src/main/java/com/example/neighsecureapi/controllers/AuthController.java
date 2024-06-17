@@ -256,20 +256,96 @@ public class AuthController {
 //                });
 //    }
 
-    @GetMapping("/google/redirect/{device}")
-    public Mono<ResponseEntity<GeneralResponse>> authenticateWithGoogleCode(@RequestParam("code") String authorizationCode, @PathVariable("device") String device) {
+    @GetMapping("/google/redirect")
+    public Mono<ResponseEntity<GeneralResponse>> authenticateWithGoogleCode(@RequestParam("code") String authorizationCode) {
         log.info("Authorization Code: {}", authorizationCode);
 
-        boolean isMobile = false;
 
-        if (device.equals("mobile")) {
-            isMobile = true;
-        }
-
-        log.info(device);
-
-        return authService.exchangeCodeForAccessToken(authorizationCode, isMobile)
+        return authService.exchangeCodeForAccessToken(authorizationCode)
                 .flatMap(authService::fetchGoogleProfile)
+                .flatMap(googleUserInfo -> {
+
+                    log.info("Getting user info... {}", googleUserInfo );
+
+                    String email = googleUserInfo.getEmail();
+                    String name = googleUserInfo.getName();
+
+                    // Use or store profile information
+                    User user = userService.findUserByEmail(email);
+
+                    if (user == null) {
+                        log.info("User not found, creating user... {}", email);
+                        Role rol = roleService.getRoleByName("Visitante");
+
+                        RegisterUserDTO registerUserDTO = new RegisterUserDTO();
+
+                        registerUserDTO.setEmail(email);
+                        registerUserDTO.setName(name);
+                        registerUserDTO.setDui(""); // se pide luego del login si es un register
+                        registerUserDTO.setPhone(""); // se pide luego del login si es un register
+
+                        userService.saveUser(registerUserDTO, rol);
+
+                        // despues de creado, se crea el token para inicar sesión y se retorna httpStatus created para identificar
+                        User userRes = userService.findUserByEmail(email);
+
+                        log.info("User created, new user found{}", userRes);
+                        try {
+                            Token token = userService.registerToken(userRes);
+                            return Mono.just(new ResponseEntity<>(
+                                    new GeneralResponse.Builder()
+                                            .message("User register successfully and session started")
+                                            .data(new TokenDTO(token))
+                                            .build(),
+                                    HttpStatus.CREATED
+                            ));
+                        } catch (Exception e) {
+                            //e.printStackTrace();
+                            return Mono.just(new ResponseEntity<>(
+                                    new GeneralResponse.Builder()
+                                            .message("User register successfully but there was an error registering the token")
+                                            .build(),
+                                    HttpStatus.INTERNAL_SERVER_ERROR));
+                        }
+
+                    }
+
+                    log.info("User google info found, responding {}", user);
+                    // if user already exists, login
+                    try {
+                        Token token = userService.registerToken(user);
+                        return Mono.just(new ResponseEntity<>(
+                                new GeneralResponse.Builder()
+                                        .message("User found")
+                                        .data(new TokenDTO(token))
+                                        .build(),
+                                HttpStatus.OK
+                        ));
+                    } catch (Exception e) {
+                        //e.printStackTrace();
+                        return Mono.just(new ResponseEntity<>(
+                                new GeneralResponse.Builder()
+                                        .message("User register successfully but there was an error registering the token")
+                                        .build(),
+                                HttpStatus.INTERNAL_SERVER_ERROR
+                        ));
+                    }
+                })
+                .onErrorResume(e -> {
+                    // On Error
+                    GeneralResponse response = new GeneralResponse.Builder()
+                            .message("There was an error fetching user info from Google")
+                            .build();
+                    return Mono.just(new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR));
+                });
+    }
+
+    @GetMapping("/google/redirect-mobile")
+    public Mono<ResponseEntity<GeneralResponse>> authWithGoogleFromMobile(@RequestParam("access_token") String accessToken) {
+
+        log.info("Access Token: {}", accessToken);
+
+        return authService.fetchGoogleProfile(accessToken)
                 .flatMap(googleUserInfo -> {
 
                     log.info("Getting user info... {}", googleUserInfo );

@@ -5,7 +5,7 @@ import com.example.neighsecureapi.domain.dtos.userDTOs.GoogleTokenInfo;
 import reactor.core.publisher.Mono;
 
 public interface AuthService {
-    Mono<String> exchangeCodeForAccessToken(String code, boolean isMobile);
+    Mono<String> exchangeCodeForAccessToken(String code);
 
     Mono<GoogleLoginDTO> fetchGoogleProfile(String accessToken);
 }

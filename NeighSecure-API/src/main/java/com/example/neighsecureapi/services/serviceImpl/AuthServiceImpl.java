@@ -35,7 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private String mobileRedirectUri;
 
     @Override
-    public Mono<String> exchangeCodeForAccessToken(String code, boolean isMobile) {
+    public Mono<String> exchangeCodeForAccessToken(String code) {
 
         log.info("Exchanging code for access token... {}", code);
         log.info("Redirect URI... {}", redirectUri);
@@ -47,18 +47,9 @@ public class AuthServiceImpl implements AuthService {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
 
         formData.set("code", authorizationCode);
-        if (isMobile) {
-            log.info("entro al de mobile");
-            formData.set("client_id", mobileClientId);
-            //formData.add("client_secret", clientSecret);
-            formData.set("redirect_uri", mobileRedirectUri);
-        } else {
-            log.info("no entro al de mobile");
-            formData.set("client_id", clientId);
-            formData.set("client_secret", clientSecret);
-            formData.set("redirect_uri", redirectUri);
-        }
-
+        formData.set("client_id", clientId);
+        formData.set("client_secret", clientSecret);
+        formData.set("redirect_uri", redirectUri);
         formData.set("grant_type", "authorization_code");
 
         log.info("Form data: {}", formData);
