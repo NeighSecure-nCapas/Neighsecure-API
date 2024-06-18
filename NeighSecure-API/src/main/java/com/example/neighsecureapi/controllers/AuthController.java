@@ -468,7 +468,6 @@ public class AuthController {
             whoAmIDTO.setHomeId(null);
         }
 
-
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("User found")
