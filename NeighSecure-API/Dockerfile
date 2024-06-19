@@ -14,6 +14,6 @@ FROM openjdk:21-jdk-slim
 EXPOSE 8080
 
 # Copiar el archivo .war de la etapa de construcción a la nueva etapa
-COPY --from=build /app/build/libs/*.war app.war
+COPY --from=build /build/libs/NeighSecure-API-0.0.1-SNAPSHOT.war app.war
 # Iniciar la aplicación Spring Boot
 CMD ["java", "-jar", "app.war"]
