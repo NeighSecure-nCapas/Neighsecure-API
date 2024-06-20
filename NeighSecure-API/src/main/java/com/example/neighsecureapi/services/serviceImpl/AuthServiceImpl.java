@@ -20,12 +20,19 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    // web
+    @Value("${spring.security.oauth2.client.registration.google-web-client.client-id}")
     private String clientId;
-    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    @Value("${spring.security.oauth2.client.registration.google-web-client.client-secret}")
     private String clientSecret;
-    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
+    @Value("${spring.security.oauth2.client.registration.google-web-client.redirect-uri}")
     private String redirectUri;
+
+    // mobile
+    @Value("${spring.security.oauth2.client.registration.google-mobile-client.client-id}")
+    private String mobileClientId;
+    @Value("${spring.security.oauth2.client.registration.google-mobile-client.redirect-uri}")
+    private String mobileRedirectUri;
 
     @Override
     public Mono<String> exchangeCodeForAccessToken(String code) {

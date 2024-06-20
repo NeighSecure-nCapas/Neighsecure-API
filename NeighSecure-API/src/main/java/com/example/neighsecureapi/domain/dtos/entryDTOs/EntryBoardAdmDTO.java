@@ -17,6 +17,8 @@ public class EntryBoardAdmDTO {
     @NotBlank
     private String user;
 
+    private String comment;
+
     @NotBlank
     private Integer homeNumber;
 

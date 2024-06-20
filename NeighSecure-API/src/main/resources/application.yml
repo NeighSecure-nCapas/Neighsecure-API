@@ -8,9 +8,9 @@ spring:
     init:
       mode: always
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres #jdbc:mysql://localhost:3306/neighsecure?useSSL=false
-    username: postgres
-    password: florerUWU!comadikWSL2
+    url: ${URL_DB} #jdbc:mysql://localhost:3306/neighsecure?useSSL=false
+    username: ${USERNAME_DB}
+    password: ${PASSWORD_DB}
   jpa:
     hibernate:
       ddl-auto: update
@@ -22,10 +22,13 @@ spring:
     oauth2:
       client:
         registration:
-          google:
-            client-id: 266523106449-pojfcjr5r4gtmlontuhfuc3ram9a54l7.apps.googleusercontent.com
-            client-secret: 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
-            redirect-uri: http://localhost:5173
+          google-web-client:
+            client-id: ${CLIENT_ID_GOOGLE_WEB}
+            client-secret: ${CLIENT_SECRET_GOOGLE_WEB}
+            redirect-uri: ${REDIRECT_URI_WEB}
+          google-mobile-client:
+            client-id: ${CLIENT_ID_GOOGLE_MOBILE}
+            redirect-uri: ${REDIRECT_URI_MOBILE}
 
 jwt:
   secret: superUltraMegaDuperAlphaSecret360BrokenPassword

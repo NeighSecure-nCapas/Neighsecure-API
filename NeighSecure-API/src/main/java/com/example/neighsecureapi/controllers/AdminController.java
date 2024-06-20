@@ -32,9 +32,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/neighSecure/admin")
-@CrossOrigin
 @Slf4j
 public class AdminController {
 
@@ -206,7 +206,6 @@ public class AdminController {
     public ResponseEntity<GeneralResponse> getDashboard() {
 
         DashboardAdmDTO dashboard = new DashboardAdmDTO();
-
 
         // envia las entradas para poder hacer las graficas, seteados con el formato necesario
         List<PresentationEntryDetailsDTO> entries = entryService.getAllEntries()
@@ -576,6 +575,7 @@ public class AdminController {
 
             entryFormat.setId(entry.getId());
             entryFormat.setDate(entry.getEntryDate());
+            entryFormat.setComment(entry.getComment());
             entryFormat.setEntryTypeTerminal(terminalService.getTerminalById(entry.getTerminalId().getTerminalId()).getEntryType());
 
             // validar si el permiso existe
