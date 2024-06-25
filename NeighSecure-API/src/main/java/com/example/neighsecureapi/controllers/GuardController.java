@@ -9,6 +9,7 @@ import com.example.neighsecureapi.domain.entities.Key;
 import com.example.neighsecureapi.domain.entities.Permission;
 import com.example.neighsecureapi.domain.entities.Terminal;
 import com.example.neighsecureapi.services.*;
+import com.example.neighsecureapi.utils.servo.ServoTools;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -31,14 +33,16 @@ public class GuardController {
     private final PermissionService permissionService;
     private final TerminalService terminalService;
     private final EntryService entryService;
+    private final ServoTools servoTools;
 
-    public GuardController(UserService userService, RoleService roleService, KeyService keyService, PermissionService permissionService, TerminalService terminalService, EntryService entryService) {
+    public GuardController(UserService userService, RoleService roleService, KeyService keyService, PermissionService permissionService, TerminalService terminalService, EntryService entryService, ServoTools servoTools) {
         this.userService = userService;
         this.roleService = roleService;
         this.keyService = keyService;
         this.permissionService = permissionService;
         this.terminalService = terminalService;
         this.entryService = entryService;
+        this.servoTools = servoTools;
     }
 
     @PreAuthorize("hasAuthority('Vigilante')")
@@ -108,6 +112,15 @@ public class GuardController {
             EntryRegisterDTO entryRegisterDTO = new EntryRegisterDTO();
             entryRegisterDTO.setDateAndHour(data.getDateAndHour());
             entryRegisterDTO.setComment(data.getComment());
+
+            // abrir la puerta dependiendo de la terminal
+            Map<String, Object> payload = Map.of("value", "ON");
+
+            if(terminal.getEntryType().equals("Peatonal")){
+                servoTools.movePea(payload);
+            } else {
+                servoTools.moveServo(payload);
+            }
 
             entryService.saveEntry(entryRegisterDTO, terminal, permissionService.findPermissionByKeyId(keyService.getKey(data.getKeyId())));
 
@@ -190,6 +203,15 @@ public class GuardController {
         EntryRegisterDTO entryRegisterDTO = new EntryRegisterDTO();
         entryRegisterDTO.setDateAndHour(data.getDateAndHour());
         entryRegisterDTO.setComment(data.getComment());
+
+        // abrir la puerta dependiendo de la terminal
+        Map<String, Object> payload = Map.of("value", "ON");
+
+        if(terminal.getEntryType().equals("Peatonal")){
+            servoTools.movePea(payload);
+        } else {
+            servoTools.moveServo(payload);
+        }
 
         entryService.saveEntry(entryRegisterDTO, terminal, permission);
 

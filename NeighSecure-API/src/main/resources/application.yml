@@ -33,3 +33,8 @@ spring:
 jwt:
   secret: superUltraMegaDuperAlphaSecret360BrokenPassword
   exptime: 1296000000
+
+adafruit:
+  io:
+    username: ${SERVO_NAME}
+    key: ${ADA_KEY}

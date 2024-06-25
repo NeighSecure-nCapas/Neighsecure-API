@@ -4,6 +4,7 @@ package com.example.neighsecureapi.controllers;
 import com.example.neighsecureapi.domain.dtos.GeneralResponse;
 import com.example.neighsecureapi.domain.dtos.homeDTOs.AddMemberDTO;
 import com.example.neighsecureapi.domain.dtos.permissionDTOs.PresentationPermissionDTO;
+import com.example.neighsecureapi.domain.dtos.userDTOs.RegisterUserDTO;
 import com.example.neighsecureapi.domain.dtos.userDTOs.UserResponseDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Permission;
@@ -42,6 +43,42 @@ public class HomeBossController {
     }
 
     // GESTION DE HOGAR------------------------------------------------------------------
+
+    @PreAuthorize("hasAuthority('Encargado')")
+    @GetMapping("/homeMembers/{homeId}")
+    public ResponseEntity<GeneralResponse> getHomeMembers(@PathVariable UUID homeId) {
+
+        Home home = homeService.getHome(homeId);
+
+        if(home == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Home not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
+        List<User> members = home.getHomeMemberId();
+
+        // implementar dto de presentacion
+        List<RegisterUserDTO> membersDTO = members.stream().map(member -> {
+            RegisterUserDTO memberDTO = new RegisterUserDTO();
+            memberDTO.setName(member.getName());
+            memberDTO.setEmail(member.getEmail());
+            memberDTO.setDui(member.getDui());
+            memberDTO.setPhone(member.getPhone());
+            return memberDTO;
+        }).toList();
+
+        return new ResponseEntity<>(
+                new GeneralResponse.Builder()
+                        .message("Members obtained successfully")
+                        .data(membersDTO)
+                        .build(),
+                HttpStatus.OK
+        );
+    }
 
     @PreAuthorize("hasAuthority('Encargado')")
     @PostMapping("/addMember")
