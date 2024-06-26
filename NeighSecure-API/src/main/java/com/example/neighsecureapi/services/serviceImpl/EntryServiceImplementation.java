@@ -7,6 +7,8 @@ import com.example.neighsecureapi.domain.entities.Terminal;
 import com.example.neighsecureapi.repositories.EntryRepository;
 import com.example.neighsecureapi.services.EntryService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -50,6 +52,11 @@ public class EntryServiceImplementation implements EntryService {
     @Override
     public List<Entry> getAllEntries() {
         return entryRepository.findAll();
+    }
+
+    @Override
+    public Page<Entry> getAllEntries(Pageable pageable) {
+        return entryRepository.findAll(pageable);
     }
 
     @Override

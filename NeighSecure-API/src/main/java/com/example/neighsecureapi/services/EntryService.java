@@ -4,6 +4,8 @@ import com.example.neighsecureapi.domain.dtos.entryDTOs.EntryRegisterDTO;
 import com.example.neighsecureapi.domain.entities.Entry;
 import com.example.neighsecureapi.domain.entities.Permission;
 import com.example.neighsecureapi.domain.entities.Terminal;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
@@ -18,6 +20,7 @@ public interface EntryService {
     public Entry getEntry(UUID entryId);
 
     public List<Entry> getAllEntries();
+    public Page<Entry> getAllEntries(Pageable pageable);
 
     public List<Entry> getAllEntriesByDate(Date date);
 

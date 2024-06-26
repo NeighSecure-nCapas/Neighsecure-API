@@ -6,6 +6,8 @@ import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.HomeRepository;
 import com.example.neighsecureapi.services.HomeService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -69,6 +71,11 @@ public class HomeServiceImplementation implements HomeService {
     public List<Home> getAllHomes() {
         // TODO: implementar paginacion
         return homeRepository.findAllByStatusIsTrue().orElse(null);
+    }
+
+    @Override
+    public Page<Home> getAllHomes(Pageable pageable) {
+        return homeRepository.findAllByStatusIsTrue(pageable);
     }
 
     @Override

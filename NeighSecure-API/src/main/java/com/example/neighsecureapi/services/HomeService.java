@@ -3,6 +3,8 @@ package com.example.neighsecureapi.services;
 import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -17,6 +19,7 @@ public interface HomeService {
 
     // TODO: implementar pagination
     public List<Home> getAllHomes();
+    public Page<Home> getAllHomes(Pageable pageable);
 
     // END OF CRUD IMPLEMENTATION ---------------------------------------------------------------------
 
