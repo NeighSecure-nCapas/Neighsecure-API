@@ -112,6 +112,15 @@ public class HomeBossController {
                     HttpStatus.NOT_FOUND
             );
         }
+        // validar que el usuario no pertenezca a otra casa mediante el rol
+        if(user.getRolId().stream().anyMatch(role -> role.getRol().equals("Residente"))) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("User already belongs to a home")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
 
         // validar si la casa ya esta llena
         if(home.getMembersNumber() == home.getHomeMemberId().size()) {
