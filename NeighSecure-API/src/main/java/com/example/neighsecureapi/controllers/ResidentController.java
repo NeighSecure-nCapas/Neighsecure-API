@@ -117,7 +117,8 @@ public class ResidentController {
     @PostMapping("/newPermission")
     public ResponseEntity<GeneralResponse> createPermission(@RequestBody @Valid RegisterPermissionDTO info) {
 
-        User visitor = userService.getUser(info.getVisitor());
+        //User visitor = userService.getUser(info.getVisitor());
+        User visitor = userService.findUserByEmail(info.getVisitor());
 
         if(visitor == null) {
             return new ResponseEntity<>(
