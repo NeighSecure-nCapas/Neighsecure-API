@@ -404,11 +404,43 @@ public class AdminController {
                     HttpStatus.BAD_REQUEST
             );
         }
+        // validar si se va a crear la casa vacia por defecto
+        if(info.getHomeMembers().isEmpty() && info.getUserAdmin() == null) {
+            // Crear un nuevo HomeRegisterDTO y llenarlo con la información de HomeRegisterDataDTO y data quemada vacia
+            HomeRegisterDTO homeRegisterDTO = new HomeRegisterDTO();
+            homeRegisterDTO.setHomeNumber(info.getHomeNumber());
+            homeRegisterDTO.setAddress(info.getAddress());
+            homeRegisterDTO.setMembersNumber(info.getMembersNumber());
+            homeRegisterDTO.setUserAdmin(null);
+            homeRegisterDTO.setHomeMembers(List.of());
+
+            // Guardar la nueva casa
+            homeService.saveHome(homeRegisterDTO);
+
+            // TERMINA PRUEBA -------------------------------------------
+
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Blank home registered successfully")
+                            .build(),
+                    HttpStatus.CREATED
+            );
+        }
 
         // PRUEBA ---------------------------------------------------
 
         // Obtener el usuario administrador y cambiar su rol a "Encargado" y "Residente
         User adminUser = userService.getUser(info.getUserAdmin());
+
+        if(adminUser == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Admin user not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
         Role adminRole = roleService.getRoleByName("Encargado");
         userService.addRoleToUser(adminUser, adminRole);
         // Agregar el segundo rol al encargado
@@ -421,6 +453,16 @@ public class AdminController {
         for(UUID memberId : info.getHomeMembers()) {
             // Obtener el usuario y cambiar su rol a "Residente"
             User memberUser = userService.getUser(memberId);
+
+            if(memberUser == null) {
+                return new ResponseEntity<>(
+                        new GeneralResponse.Builder()
+                                .message("Member user not found")
+                                .build(),
+                        HttpStatus.NOT_FOUND
+                );
+            }
+
             Role memberRole = roleService.getRoleByName("Residente");
             userService.addRoleToUser(memberUser, memberRole);
 
