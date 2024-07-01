@@ -5,6 +5,8 @@ import com.example.neighsecureapi.domain.dtos.homeDTOs.HomeRegisterDataDTO;
 import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.User;
+import com.example.neighsecureapi.services.HomeService;
+import com.example.neighsecureapi.services.RoleService;
 import com.example.neighsecureapi.services.UserService;
 import org.springframework.stereotype.Component;
 
@@ -16,9 +18,13 @@ import java.util.UUID;
 public class UserHomeTools {
 
     private final UserService userService;
+    private final HomeService homeService;
+    private final RoleService roleService;
 
-    public UserHomeTools(UserService userService) {
+    public UserHomeTools(UserService userService, HomeService homeService, RoleService roleService) {
         this.userService = userService;
+        this.homeService = homeService;
+        this.roleService = roleService;
     }
 
     public void updateRoleAndHome(User user, Role rolAdm, Role rolMember, Home home, List<User> homeMembers){
@@ -53,6 +59,31 @@ public class UserHomeTools {
         }
 
         return homeRegisterDTO;
+    }
+
+    public void RemoveUserFromHome(User user){
+        // buscar si el usuario esta en algun hogar
+        Home home = homeService.findHomeByUser(user);
+
+        if(home == null) return;
+
+        // validar el rol del usuario
+        if(user.getRolId().contains(roleService.getRoleByName("Encargado"))){
+            // se elimina el encargado de la casa, que es el usuario
+            homeService.removeHomeAdmin(home);
+
+            // se eliminan los roles del usuario
+            userService.deleteRoleToUser(user, roleService.getRoleByName("Encargado"));
+            userService.deleteRoleToUser(user, roleService.getRoleByName("Residente"));
+
+            return;
+        }
+
+        // si el usuario pertenece a un hogar y no es encargado, se elimina de la lista de miembros
+        homeService.removeHomeMembers(home, user);
+
+        // quitar los roles del usuario
+        userService.deleteRoleToUser(user, roleService.getRoleByName("Residente"));
     }
 
 }

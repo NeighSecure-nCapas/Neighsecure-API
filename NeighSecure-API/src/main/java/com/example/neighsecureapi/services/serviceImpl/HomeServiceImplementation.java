@@ -121,7 +121,10 @@ public class HomeServiceImplementation implements HomeService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void removeHomeAdmin(String homeName, String homeAddress, String homeAdmins) {
+    public void removeHomeAdmin(Home home) {
+
+        home.setHomeOwnerId(null);
+        homeRepository.save(home);
 
     }
 

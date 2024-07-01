@@ -32,7 +32,7 @@ public interface HomeService {
 
     // METHODS FOR HOME ADMINS ------------------------------------------------------------------------
     public void updateHomeAdmin(Home home, User homeAdmin);
-    public void removeHomeAdmin(String homeName, String homeAddress, String homeAdmins);
+    public void removeHomeAdmin(Home home);
     public Home findHomeByAddressAndHomeNumber(String address, Integer homeNumber);
 
     // METHODS FOR HOME MEMBERS VALIDATION ------------------------------------------------------------------------

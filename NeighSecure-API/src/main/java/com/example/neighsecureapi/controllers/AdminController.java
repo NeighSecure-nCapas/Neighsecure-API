@@ -135,6 +135,8 @@ public class AdminController {
                     HttpStatus.NOT_FOUND
             );
         }
+        // eliminar al usuario de la casa si es que pertenece a una
+        userHomeTools.RemoveUserFromHome(user);
 
         userService.deleteUser(userId);
 
@@ -525,6 +527,13 @@ public class AdminController {
                             .build(),
                     HttpStatus.NOT_FOUND
             );
+        }
+        // eliminar los roles de los usuarios de la casa
+        userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Residente"));
+        userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Encargado"));
+
+        for(User member : home.getHomeMemberId()){
+            userService.deleteRoleToUser(member, roleService.getRoleByName("Residente"));
         }
 
         homeService.deleteHome(home);
