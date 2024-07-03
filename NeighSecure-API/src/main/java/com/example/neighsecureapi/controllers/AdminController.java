@@ -313,7 +313,13 @@ public class AdminController {
                     PresentationHomeDTO homeDTO = new PresentationHomeDTO();
                     homeDTO.setId(home.getId());
                     homeDTO.setHomeNumber(home.getHomeNumber());
-                    homeDTO.setHomeBoss(home.getHomeOwnerId().getName());
+
+                    if(home.getHomeOwnerId() == null){
+                        homeDTO.setHomeBoss("Sin propietario asignado");
+                    }else{
+                        homeDTO.setHomeBoss(home.getHomeOwnerId().getName());
+                    }
+
                     return homeDTO;
                 }).toList();
 
