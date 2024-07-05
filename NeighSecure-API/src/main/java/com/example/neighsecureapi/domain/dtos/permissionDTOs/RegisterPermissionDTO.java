@@ -39,7 +39,7 @@ public class RegisterPermissionDTO {
     private UUID homeId;
 
     @NotNull
-    private UUID visitor;// quien recibe el permiso
+    private String visitor;// quien recibe el permiso
 
     @NotNull
     private UUID grantedBy;// quien da el permiso

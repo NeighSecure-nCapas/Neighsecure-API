@@ -20,6 +20,9 @@ import com.example.neighsecureapi.services.*;
 import com.example.neighsecureapi.utils.FilterUserTools;
 import com.example.neighsecureapi.utils.UserHomeTools;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,10 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -135,6 +135,8 @@ public class AdminController {
                     HttpStatus.NOT_FOUND
             );
         }
+        // eliminar al usuario de la casa si es que pertenece a una
+        userHomeTools.RemoveUserFromHome(user);
 
         userService.deleteUser(userId);
 
@@ -149,20 +151,41 @@ public class AdminController {
 
     @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/users/role/{role}")
-    public ResponseEntity<GeneralResponse> getUsersByRole(@PathVariable String role) {
+    public ResponseEntity<GeneralResponse> getUsersByRole(
+            @PathVariable String role,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
 
         String roleFixed = role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
 
         Role roleFilter = roleService.getRoleByName(roleFixed);
 
-        List<UserResponseDTO> users = filterUserTools.filterUsersByRole(userService.getAllUsers(), roleFilter)
-                .stream().toList();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<User> users = userService.getAllUsersByRole(pageable, roleFilter);
 
+        //List<UserResponseDTO> users = filterUserTools.filterUsersByRole(userService.getAllUsers(), roleFilter)
+                //.stream().toList();
+        List<UserResponseDTO> usersDTO = users
+                .stream().map(user -> {
+                    UserResponseDTO userResponseDTO = new UserResponseDTO();
+                    userResponseDTO.setId(user.getId());
+                    userResponseDTO.setName(user.getName());
+                    userResponseDTO.setEmail(user.getEmail());
+                    userResponseDTO.setPhone(user.getPhone());
+                    userResponseDTO.setDui(user.getDui());
+                    userResponseDTO.setHomeNumber(homeService.findHomeByUser(user) != null ? homeService.findHomeByUser(user).getHomeNumber() : 0);
+                    return userResponseDTO;
+                }).toList();
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("users", usersDTO);
+        response.put("totalPages", users.getTotalPages());
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Users obtained successfully")
-                        .data(users)
+                        .data(response)
                         .build(),
                 HttpStatus.OK
         );
@@ -275,9 +298,14 @@ public class AdminController {
 
     @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/homes")
-    public ResponseEntity<GeneralResponse> getAllHomes() {
+    public ResponseEntity<GeneralResponse> getAllHomes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
 
-        List<Home> homes = homeService.getAllHomes();
+        //List<Home> homes = homeService.getAllHomes();
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Home> homes = homeService.getAllHomes(pageable);
 
         // se mapea la lista de casas a un dto para no enviar la data sensible
         List<PresentationHomeDTO> homesDTO = homes
@@ -285,14 +313,25 @@ public class AdminController {
                     PresentationHomeDTO homeDTO = new PresentationHomeDTO();
                     homeDTO.setId(home.getId());
                     homeDTO.setHomeNumber(home.getHomeNumber());
-                    homeDTO.setHomeBoss(home.getHomeOwnerId().getName());
+
+                    if(home.getHomeOwnerId() == null){
+                        homeDTO.setHomeBoss("Sin propietario asignado");
+                    }else{
+                        homeDTO.setHomeBoss(home.getHomeOwnerId().getName());
+                    }
+
                     return homeDTO;
                 }).toList();
+
+        // enviar una response que contenga el numero total de paginas y la pagina
+        Map<String, Object> response = new HashMap<>();
+        response.put("homes", homesDTO);
+        response.put("totalPages", homes.getTotalPages());
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Homes obtained successfully")
-                        .data(homesDTO)
+                        .data(response)
                         .build(),
                 HttpStatus.OK
         );
@@ -371,11 +410,43 @@ public class AdminController {
                     HttpStatus.BAD_REQUEST
             );
         }
+        // validar si se va a crear la casa vacia por defecto
+        if(info.getHomeMembers().isEmpty() && info.getUserAdmin() == null) {
+            // Crear un nuevo HomeRegisterDTO y llenarlo con la información de HomeRegisterDataDTO y data quemada vacia
+            HomeRegisterDTO homeRegisterDTO = new HomeRegisterDTO();
+            homeRegisterDTO.setHomeNumber(info.getHomeNumber());
+            homeRegisterDTO.setAddress(info.getAddress());
+            homeRegisterDTO.setMembersNumber(info.getMembersNumber());
+            homeRegisterDTO.setUserAdmin(null);
+            homeRegisterDTO.setHomeMembers(List.of());
+
+            // Guardar la nueva casa
+            homeService.saveHome(homeRegisterDTO);
+
+            // TERMINA PRUEBA -------------------------------------------
+
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Blank home registered successfully")
+                            .build(),
+                    HttpStatus.CREATED
+            );
+        }
 
         // PRUEBA ---------------------------------------------------
 
         // Obtener el usuario administrador y cambiar su rol a "Encargado" y "Residente
         User adminUser = userService.getUser(info.getUserAdmin());
+
+        if(adminUser == null) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Admin user not found")
+                            .build(),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+
         Role adminRole = roleService.getRoleByName("Encargado");
         userService.addRoleToUser(adminUser, adminRole);
         // Agregar el segundo rol al encargado
@@ -388,6 +459,16 @@ public class AdminController {
         for(UUID memberId : info.getHomeMembers()) {
             // Obtener el usuario y cambiar su rol a "Residente"
             User memberUser = userService.getUser(memberId);
+
+            if(memberUser == null) {
+                return new ResponseEntity<>(
+                        new GeneralResponse.Builder()
+                                .message("Member user not found")
+                                .build(),
+                        HttpStatus.NOT_FOUND
+                );
+            }
+
             Role memberRole = roleService.getRoleByName("Residente");
             userService.addRoleToUser(memberUser, memberRole);
 
@@ -495,6 +576,13 @@ public class AdminController {
                     HttpStatus.NOT_FOUND
             );
         }
+        // eliminar los roles de los usuarios de la casa
+        userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Residente"));
+        userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Encargado"));
+
+        for(User member : home.getHomeMemberId()){
+            userService.deleteRoleToUser(member, roleService.getRoleByName("Residente"));
+        }
 
         homeService.deleteHome(home);
 
@@ -509,7 +597,10 @@ public class AdminController {
     // ENTRY SECTION --------------------------------------------------------------
     @PreAuthorize("hasAuthority('Administrador')")
     @GetMapping("/entries")
-    public ResponseEntity<GeneralResponse> getAllEntries() {
+    public ResponseEntity<GeneralResponse> getAllEntries(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
 
         // se mapea la lista de entradas a un dto para no enviar la data sensible y dar formato
 
@@ -524,7 +615,9 @@ public class AdminController {
 //                    return entryBoardAdmDTO;
 //                }).toList();
 
-        List<PresentationEntryDTO> entries = entryService.getAllEntries()
+        Pageable pageable = PageRequest.of(page, size);
+
+        List<PresentationEntryDTO> entries = entryService.getAllEntries(pageable)
                 .stream().map(entry -> {
                     PresentationEntryDTO entryDTO = new PresentationEntryDTO();
                     entryDTO.setId(entry.getId());
@@ -544,11 +637,14 @@ public class AdminController {
                     return entryDTO;
                 }).toList();
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("entries", entries);
+        response.put("totalPages", entryService.getAllEntries(pageable).getTotalPages());
 
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Entries obtained successfully")
-                        .data(entries)
+                        .data(response)
                         .build(),
                 HttpStatus.OK
         );

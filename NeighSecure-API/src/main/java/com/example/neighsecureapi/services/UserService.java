@@ -5,6 +5,8 @@ import com.example.neighsecureapi.domain.entities.Home;
 import com.example.neighsecureapi.domain.entities.Role;
 import com.example.neighsecureapi.domain.entities.Token;
 import com.example.neighsecureapi.domain.entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +14,6 @@ import java.util.UUID;
 public interface UserService {
 
     // CRUD IMPLEMENTATION FOR USER ENTITY
-    //TODO: implementar login
     public void saveUser(RegisterUserDTO info, Role role);
     public void deleteUser(UUID userId);
 
@@ -21,6 +22,7 @@ public interface UserService {
 
     // TODO: implementar pagination
     public List<User> getAllUsers();
+    public Page<User> getAllUsersByRole(Pageable pageable, Role rol);
 
     // END OF CRUD IMPLEMENTATION
 

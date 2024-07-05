@@ -6,6 +6,8 @@ import com.example.neighsecureapi.domain.entities.User;
 import com.example.neighsecureapi.repositories.HomeRepository;
 import com.example.neighsecureapi.services.HomeService;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -72,6 +74,11 @@ public class HomeServiceImplementation implements HomeService {
     }
 
     @Override
+    public Page<Home> getAllHomes(Pageable pageable) {
+        return homeRepository.findAllByStatusIsTrue(pageable);
+    }
+
+    @Override
     public Home findHomeByUser(User user) {
         return homeRepository.findByHomeOwnerIdOrHomeMemberIdAndStatusIsTrue(user, user).orElse(null);
     }
@@ -114,7 +121,10 @@ public class HomeServiceImplementation implements HomeService {
 
     @Override
     @Transactional(rollbackOn = Exception.class)
-    public void removeHomeAdmin(String homeName, String homeAddress, String homeAdmins) {
+    public void removeHomeAdmin(Home home) {
+
+        home.setHomeOwnerId(null);
+        homeRepository.save(home);
 
     }
 

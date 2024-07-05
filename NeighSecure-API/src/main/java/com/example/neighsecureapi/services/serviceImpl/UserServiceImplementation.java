@@ -10,6 +10,8 @@ import com.example.neighsecureapi.repositories.UserRepository;
 import com.example.neighsecureapi.services.UserService;
 import com.example.neighsecureapi.utils.jwt.JWTTools;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -72,6 +74,11 @@ public class UserServiceImplementation implements UserService {
     public List<User> getAllUsers() {
         // TODO: implementar paginacion
         return userRepository.findAllByActiveIsTrue();
+    }
+
+    @Override
+    public Page<User> getAllUsersByRole(Pageable pageable, Role rol) {
+        return userRepository.findAllByActiveIsTrueAndRolId(pageable, rol);
     }
 
     @Override

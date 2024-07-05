@@ -21,7 +21,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -71,10 +73,14 @@ public class HomeBossController {
             return memberDTO;
         }).toList();
 
+        Map<String, Object> response = new HashMap<>();
+        response.put("homeMembers", membersDTO);
+        response.put("numberOfMembers", home.getMembersNumber());
+
         return new ResponseEntity<>(
                 new GeneralResponse.Builder()
                         .message("Members obtained successfully")
-                        .data(membersDTO)
+                        .data(response)
                         .build(),
                 HttpStatus.OK
         );
@@ -104,6 +110,15 @@ public class HomeBossController {
                             .message("User not found")
                             .build(),
                     HttpStatus.NOT_FOUND
+            );
+        }
+        // validar que el usuario no pertenezca a otra casa mediante el rol
+        if(user.getRolId().stream().anyMatch(role -> role.getRol().equals("Residente"))) {
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("User already belongs to a home")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
             );
         }
 
