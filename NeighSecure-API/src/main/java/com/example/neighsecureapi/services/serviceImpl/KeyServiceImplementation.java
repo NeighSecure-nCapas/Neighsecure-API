@@ -70,8 +70,8 @@ public class KeyServiceImplementation implements KeyService {
 
         //return key.getGenerationTime().after(Date.from(Instant.now().minus(10, ChronoUnit.MINUTES) ));
 
-        return Duration.between(key.getGenerationTime(), LocalTime.now()).toMinutes() < 10;
-
+        //return Duration.between(key.getGenerationTime(), LocalTime.now()).toMinutes() < 3;
+        return ChronoUnit.MINUTES.between(key.getGenerationTime(), LocalTime.now()) < 5;
         /*
         funcion de copilot
         // Obtén la hora actual
