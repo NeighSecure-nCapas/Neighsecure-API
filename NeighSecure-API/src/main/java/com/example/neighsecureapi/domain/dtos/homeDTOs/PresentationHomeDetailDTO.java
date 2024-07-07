@@ -17,4 +17,6 @@ public class PresentationHomeDetailDTO {
     private PresentationUserDetailsDTO homeBoss;
 
     private List<PresentationUserDetailsDTO> members;
+
+    private String address;
 }

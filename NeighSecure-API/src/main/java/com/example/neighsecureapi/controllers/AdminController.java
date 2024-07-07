@@ -361,6 +361,7 @@ public class AdminController {
         homeFullDataDTO.setId(home.getId());
         homeFullDataDTO.setHomeNumber(home.getHomeNumber());
         homeFullDataDTO.setMembersNumber(home.getMembersNumber());
+        homeFullDataDTO.setAddress(home.getAddress());
 
         // setear el jefe de la casa
         PresentationUserDetailsDTO homeBoss = new PresentationUserDetailsDTO();
