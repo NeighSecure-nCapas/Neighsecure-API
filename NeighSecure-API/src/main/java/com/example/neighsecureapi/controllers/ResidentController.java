@@ -172,7 +172,7 @@ public class ResidentController {
         if(info.getStartDate().compareTo(now) < 0) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("The start date must be greater than the current date" + now + " " + info.getStartDate())
+                            .message("The start date must be greater than the current date")
                             .build(),
                     HttpStatus.BAD_REQUEST
             );
