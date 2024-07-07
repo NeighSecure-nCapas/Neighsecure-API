@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -165,7 +166,8 @@ public class ResidentController {
         //TODO: VALIDAR POR QUE RESTA 1 A LA FECHA RECIBIDA
         // SI RECIBE LOCALdATE NO SURGE EL ERROR DE RESTAR 1, ver registerPermissionDTO
         //LocalDate startDate = LocalDate.ofInstant(info.getStartDate().toInstant(), ZoneId.systemDefault());
-        LocalDate now = LocalDate.now();
+        //LocalDate now = LocalDate.now();
+        LocalDate now = ZonedDateTime.now(ZoneId.of("America/Mexico_city")).toLocalDate();
         log.info("Fecha actual: " + now);
         log.info("Fecha de inicio: " + info.getStartDate());
         log.info(info.getStartDate().compareTo(now) + "");
