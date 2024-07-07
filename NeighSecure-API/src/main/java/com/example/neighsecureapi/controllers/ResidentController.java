@@ -45,7 +45,7 @@ public class ResidentController {
 
     @PreAuthorize("hasAnyAuthority('Encargado', 'Residente')")
     @GetMapping("/permissions/home/{homeId}")
-    public ResponseEntity<GeneralResponse> getAllPermissionsByHome(@PathVariable UUID homeId) {
+    public ResponseEntity<GeneralResponse> getAllPermissionsByHome(@RequestHeader("Authorization") String bearerToken, @PathVariable UUID homeId) {
 
         Home home = homeService.getHome(homeId);
 
@@ -57,6 +57,11 @@ public class ResidentController {
                     HttpStatus.NOT_FOUND
             );
         }
+        // obtener el usuario que manda la peticion
+        String token = bearerToken.substring(7);
+        Token tokenEntity = tokenService.findTokenBycontent(token);
+
+        User user = userService.findUserByToken(tokenEntity);
 
         List<Permission> permissions = permissionService.getPermissionsByHome(home);
         // TODO: validar si se debe retornar la lista de permisos entera o solo los que estan pendientes y aun son validos
@@ -64,6 +69,7 @@ public class ResidentController {
         // implementar dtod e presentacion para retornar solo los datos necesarios
         List<PresentationPermissionDTO> permissionsDTO = permissions.stream()
                 .filter(permission -> permission.getUserAuth() != null && permission.getStartDate() != null && permission.getEndDate() != null)
+                .filter(permission -> user.getRolId().contains(roleService.getRoleByName("Encargado")) || permission.getUserAuth().equals(user))
                 .sorted(Comparator.comparing(Permission::getGenerationDate).reversed())
                 .map(permission -> {
             PresentationPermissionDTO permissionDTO = new PresentationPermissionDTO();
