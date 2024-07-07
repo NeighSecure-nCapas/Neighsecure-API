@@ -172,7 +172,7 @@ public class ResidentController {
         if(info.getStartDate().compareTo(now) < 0) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
-                            .message("The start date must be greater than the current date")
+                            .message("The start date must be greater than the current date" + info.getStartDate().compareTo(now))
                             .build(),
                     HttpStatus.BAD_REQUEST
             );
@@ -181,7 +181,7 @@ public class ResidentController {
         //LocalDate endDate = LocalDate.ofInstant(info.getEndDate().toInstant(), ZoneId.systemDefault());
         LocalDate nowEnd = LocalDate.now();
 
-        if(info.getEndDate().compareTo(nowEnd) <= 0 || info.getEndDate().isBefore(info.getStartDate())) {
+        if(info.getEndDate().compareTo(nowEnd) < 0 || info.getEndDate().isBefore(info.getStartDate())) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
                             .message("The end date must be greater than the current date")
