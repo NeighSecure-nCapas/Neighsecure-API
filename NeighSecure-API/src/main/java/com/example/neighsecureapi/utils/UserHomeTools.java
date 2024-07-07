@@ -86,4 +86,35 @@ public class UserHomeTools {
         userService.deleteRoleToUser(user, roleService.getRoleByName("Residente"));
     }
 
+    public boolean CheckUserHome(UUID boss, List<UUID> homeMembers){
+        // buscar si el usuario esta en algun hogar, validando los roles, ya que si son residentes, ya tienen casa
+        if(userService.getUser(boss).getRolId().contains(roleService.getRoleByName("Encargado"))){
+            return false;
+        }
+
+        for(UUID userId : homeMembers){
+            if(userService.getUser(userId).getRolId().contains(roleService.getRoleByName("Residente"))){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    // funcion para validar si un usuario pertenece a una casa en especifico
+    public boolean CheckUserInHome(UUID userId, UUID homeId){
+        Home home = homeService.getHome(homeId);
+        User user = userService.getUser(userId);
+
+        if(home == null || user == null) return false;
+
+        if(home.getHomeMemberId().contains(user)){
+            return true;
+        }
+
+        return false;
+    }
+
+
+
 }

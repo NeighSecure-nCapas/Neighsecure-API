@@ -429,6 +429,15 @@ public class AdminController {
                     HttpStatus.CREATED
             );
         }
+        // validar que el jefe y los miembros no pertenezcan a otra casa
+        if(!userHomeTools.CheckUserHome(info.getUserAdmin(), info.getHomeMembers())){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Some users are already in a home")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
 
         // PRUEBA ---------------------------------------------------
 
