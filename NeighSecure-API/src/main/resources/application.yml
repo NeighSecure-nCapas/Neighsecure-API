@@ -3,7 +3,7 @@
 
 spring:
   jackson:
-    time-zone: America/Mexico_City
+    time-zone: America/El_Salvador
   application:
     name: NeighSecure-API
   sql:
