@@ -88,7 +88,7 @@ public class UserHomeTools {
 
     public boolean CheckUserHome(UUID boss, List<UUID> homeMembers){
         // buscar si el usuario esta en algun hogar, validando los roles, ya que si son residentes, ya tienen casa
-        if(userService.getUser(boss).getRolId().contains(roleService.getRoleByName("Encargado"))){
+        if(userService.getUser(boss).getRolId().contains(roleService.getRoleByName("Encargado")) || userService.getUser(boss).getRolId().contains(roleService.getRoleByName("Residente"))){
             return false;
         }
 
