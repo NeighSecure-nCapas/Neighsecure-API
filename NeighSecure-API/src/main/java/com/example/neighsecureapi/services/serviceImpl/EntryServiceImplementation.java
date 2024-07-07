@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -60,8 +61,10 @@ public class EntryServiceImplementation implements EntryService {
     }
 
     @Override
-    public List<Entry> getAllEntriesByDate(Date date) {
-        return entryRepository.findAllByEntryDate(date);
+    public List<Entry> getAllEntriesByDate(LocalDate date) {
+
+        //return entryRepository.findAllByEntryDate(date);
+        return entryRepository.findAllByEntryDateIgnoringTime(date);
     }
 
 

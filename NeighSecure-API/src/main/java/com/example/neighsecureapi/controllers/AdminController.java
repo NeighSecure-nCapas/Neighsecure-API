@@ -232,7 +232,7 @@ public class AdminController {
 
         // envia las entradas para poder hacer las graficas, seteados con el formato necesario
         List<PresentationEntryDetailsDTO> entries = entryService.getAllEntries()
-                .stream().map(entry -> {
+                .stream().sorted(Comparator.comparing(Entry::getEntryDate).reversed()).map(entry -> {
                     PresentationEntryDetailsDTO entryDTO = new PresentationEntryDetailsDTO();
                     entryDTO.setId(entry.getId());
                     entryDTO.setDate(entry.getEntryDate());
@@ -279,10 +279,7 @@ public class AdminController {
         // Obtén la fecha actual como LocalDate
         LocalDate localDate = LocalDate.now();
 
-        // Convierte LocalDate a Date
-        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-
-        dashboard.setTotalVisitorsToday(entryService.getAllEntriesByDate(date).size());
+        dashboard.setTotalVisitorsToday(entryService.getAllEntriesByDate(localDate).size());
 
         // envia el dto con la data necesaria para la vista
         return new ResponseEntity<>(

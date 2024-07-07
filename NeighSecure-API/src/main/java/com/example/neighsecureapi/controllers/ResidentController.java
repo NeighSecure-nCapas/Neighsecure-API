@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -62,7 +62,7 @@ public class ResidentController {
         // TODO: validar si se debe retornar la lista de permisos entera o solo los que estan pendientes y aun son validos
 
         // implementar dtod e presentacion para retornar solo los datos necesarios
-        List<PresentationPermissionDTO> permissionsDTO = permissions.stream()
+        List<PresentationPermissionDTO> permissionsDTO = permissions.stream().sorted(Comparator.comparing(Permission::getGenerationDate).reversed())
                 .filter(permission -> permission.getUserAuth() != null && permission.getStartDate() != null && permission.getEndDate() != null)
                 .map(permission -> {
             PresentationPermissionDTO permissionDTO = new PresentationPermissionDTO();
@@ -166,8 +166,7 @@ public class ResidentController {
         //TODO: VALIDAR POR QUE RESTA 1 A LA FECHA RECIBIDA
         // SI RECIBE LOCALdATE NO SURGE EL ERROR DE RESTAR 1, ver registerPermissionDTO
         //LocalDate startDate = LocalDate.ofInstant(info.getStartDate().toInstant(), ZoneId.systemDefault());
-        //LocalDate now = LocalDate.now();
-        LocalDate now = ZonedDateTime.now(ZoneId.of("America/Mexico_city")).toLocalDate();
+        LocalDate now = LocalDate.now();
         log.info("Fecha actual: " + now);
         log.info("Fecha de inicio: " + info.getStartDate());
         log.info(info.getStartDate().compareTo(now) + "");

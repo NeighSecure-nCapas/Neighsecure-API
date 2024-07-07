@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,7 +63,7 @@ public class VisitController {
         List<Permission> permissions = permissionService.getPermissionsByUser(user);
 
         // implementar dtod e presentacion para retornar solo los datos necesarios
-        List<PresentationPermissionDTO> permissionsDTO = permissions.stream()
+        List<PresentationPermissionDTO> permissionsDTO = permissions.stream().sorted(Comparator.comparing(Permission::getGenerationDate).reversed())
                 .filter(permission -> permission.getUserAuth() != null && permission.getStartDate() != null && permission.getEndDate() != null)
                 .map(permission -> {
                     PresentationPermissionDTO permissionDTO = new PresentationPermissionDTO();
