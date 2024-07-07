@@ -63,8 +63,9 @@ public class VisitController {
         List<Permission> permissions = permissionService.getPermissionsByUser(user);
 
         // implementar dtod e presentacion para retornar solo los datos necesarios
-        List<PresentationPermissionDTO> permissionsDTO = permissions.stream().sorted(Comparator.comparing(Permission::getGenerationDate).reversed())
+        List<PresentationPermissionDTO> permissionsDTO = permissions.stream()
                 .filter(permission -> permission.getUserAuth() != null && permission.getStartDate() != null && permission.getEndDate() != null)
+                .sorted(Comparator.comparing(Permission::getGenerationDate).reversed())
                 .map(permission -> {
                     PresentationPermissionDTO permissionDTO = new PresentationPermissionDTO();
                     permissionDTO.setId(permission.getId());

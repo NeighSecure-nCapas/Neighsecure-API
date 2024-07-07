@@ -62,8 +62,9 @@ public class ResidentController {
         // TODO: validar si se debe retornar la lista de permisos entera o solo los que estan pendientes y aun son validos
 
         // implementar dtod e presentacion para retornar solo los datos necesarios
-        List<PresentationPermissionDTO> permissionsDTO = permissions.stream().sorted(Comparator.comparing(Permission::getGenerationDate).reversed())
+        List<PresentationPermissionDTO> permissionsDTO = permissions.stream()
                 .filter(permission -> permission.getUserAuth() != null && permission.getStartDate() != null && permission.getEndDate() != null)
+                .sorted(Comparator.comparing(Permission::getGenerationDate).reversed())
                 .map(permission -> {
             PresentationPermissionDTO permissionDTO = new PresentationPermissionDTO();
             permissionDTO.setId(permission.getId());
