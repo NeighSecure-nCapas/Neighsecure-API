@@ -168,7 +168,7 @@ public class ResidentController {
         LocalDate now = LocalDate.now();
         log.info("Fecha actual: " + now);
         log.info("Fecha de inicio: " + info.getStartDate());
-        if(info.getStartDate().compareTo(now) < 0) {
+        if(info.getStartDate().compareTo(now) <= 0) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
                             .message("The start date must be greater than the current date")
@@ -180,7 +180,7 @@ public class ResidentController {
         //LocalDate endDate = LocalDate.ofInstant(info.getEndDate().toInstant(), ZoneId.systemDefault());
         LocalDate nowEnd = LocalDate.now();
 
-        if(info.getEndDate().compareTo(nowEnd) < 0 || info.getEndDate().isBefore(info.getStartDate())) {
+        if(info.getEndDate().compareTo(nowEnd) <= 0 || info.getEndDate().isBefore(info.getStartDate())) {
             return new ResponseEntity<>(
                     new GeneralResponse.Builder()
                             .message("The end date must be greater than the current date")
