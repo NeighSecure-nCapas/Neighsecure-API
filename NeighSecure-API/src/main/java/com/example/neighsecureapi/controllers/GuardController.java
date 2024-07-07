@@ -76,6 +76,15 @@ public class GuardController {
         entryRegisterDTO.setDateAndHour(data.getDateAndHour());
         entryRegisterDTO.setComment(data.getComment());
 
+        // abrir la puerta dependiendo de la terminal
+        Map<String, Object> payload = Map.of("value", "ON");
+
+        if(terminal.getEntryType().equals("Peatonal")){
+            servoTools.movePea(payload);
+        } else {
+            servoTools.moveServo(payload);
+        }
+
         // envio permiso null por q al ser anonima no tiene permiso relacionado
         entryService.saveEntry(entryRegisterDTO, terminal, null);
 
