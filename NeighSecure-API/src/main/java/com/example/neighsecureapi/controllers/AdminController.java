@@ -527,6 +527,16 @@ public class AdminController {
             userService.deleteRoleToUser(member, roleService.getRoleByName("Residente"));
         }
 
+        // valido que el jefe y los miembros no pertenezcan a otra casa, y si son los mismos, ya no deberian tener roles
+        if(!userHomeTools.CheckUserHome(info.getUserAdmin(), info.getHomeMembers())){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Some users are already in a home")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
+
         // Obtener el nuevo usuario administrador y cambiar su rol a "Encargado"
         User adminUser = userService.getUser(info.getUserAdmin());
         Role adminRole = roleService.getRoleByName("Encargado");
