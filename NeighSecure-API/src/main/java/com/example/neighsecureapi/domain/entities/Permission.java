@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -23,23 +25,26 @@ public class Permission {
     private UUID id;
 
     @Column(name = "tipoPermiso")
-    private String type;
+    private String type; // Unica, Multiple, Anonima
 
-    @Column(name = "fechaInicio")
-    private Date startDate;
+    @Column(name = "fechaInicio")// año-mes-dia
+    private LocalDate startDate;
 
-    @Column(name = "fechaFin")
-    private Date endDate;
+    @Column(name = "fechaFin")// año-mes-dia
+    private LocalDate endDate;
 
     // TODO: validar la forma en que solo reciba horas y minutos
-    @Column(name = "horaInicio")
-    private Date startTime;
+    @Column(name = "horaInicio")//horas:minutos:segundos
+    private LocalTime startTime;
 
     @Column(name = "horaFin")
-    private Date endTime;
+    private LocalTime endTime;
 
-    @Column(name = "estado")
-    private boolean status;
+    @Column(name = "estado")// aprobado true, rechazado false, pendiente null
+    private Boolean status;
+
+    @Column(name = "vigente")// aun es utilizable true, ya no false(y si no ha sido aprobado, no se puede usar)
+    private boolean valid;
 
     // TODO: validar si esta bien la relacion
     @JoinColumn(name = "llaveId")
@@ -54,12 +59,21 @@ public class Permission {
     private String days; // metodo del servicio para que reciba varios dias
 
     @JoinColumn(name = "casaId") // TODO: LLAVE FORANEA
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     private Home homeId;
 
     @JoinColumn(name = "usuarioId") // TODO: LLAVE FORANEA
-    @ManyToOne
-    private User userId;
+    @ManyToOne(fetch = FetchType.EAGER)
+    //@JsonIgnore
+    private User userId;// usuario al que pertenece el permiso
+
+    @JoinColumn(name = "usuarioAuth") // TODO: LLAVE FORANEA
+    @ManyToOne(fetch = FetchType.EAGER )
+    //@JsonIgnore
+    private User userAuth; // usuario que emitio el permiso
+
+    @Column(name = "activo")
+    private boolean active;// si el permiso sigue activo o no, para eliminarlo
 
     @OneToMany(mappedBy = "id", fetch = FetchType.LAZY)
     @JsonIgnore

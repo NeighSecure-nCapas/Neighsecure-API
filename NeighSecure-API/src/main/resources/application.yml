@@ -2,15 +2,17 @@
 
 
 spring:
+  jackson:
+    time-zone: America/El_Salvador
   application:
     name: NeighSecure-API
   sql:
     init:
       mode: always
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres #jdbc:mysql://localhost:3306/neighsecure?useSSL=false
-    username: postgres
-    password: florerUWU!comadikWSL2
+    url: ${URL_DB} #jdbc:mysql://localhost:3306/neighsecure?useSSL=false
+    username: ${USERNAME_DB}
+    password: ${PASSWORD_DB}
   jpa:
     hibernate:
       ddl-auto: update
@@ -18,3 +20,23 @@ spring:
       hibernate:
         globally_quoted_identifiers: true
     show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google-web-client:
+            client-id: ${CLIENT_ID_GOOGLE_WEB}
+            client-secret: ${CLIENT_SECRET_GOOGLE_WEB}
+            redirect-uri: ${REDIRECT_URI_WEB}
+          google-mobile-client:
+            client-id: ${CLIENT_ID_GOOGLE_MOBILE}
+            redirect-uri: ${REDIRECT_URI_MOBILE}
+
+jwt:
+  secret: superUltraMegaDuperAlphaSecret360BrokenPassword
+  exptime: 1296000000
+
+adafruit:
+  io:
+    username: ${SERVO_NAME}
+    key: ${ADA_KEY}
