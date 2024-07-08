@@ -41,7 +41,8 @@ public class HomeServiceImplementation implements HomeService {
     @Override
     @Transactional(rollbackOn = Exception.class)
     public void deleteHome(Home home) {
-
+        home.setHomeOwnerId(null);
+        home.setHomeMemberId(new ArrayList<>());
         home.setStatus(false);
         homeRepository.save(home);
 

@@ -594,8 +594,10 @@ public class AdminController {
             );
         }
         // eliminar los roles de los usuarios de la casa
-        userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Residente"));
-        userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Encargado"));
+        if(home.getHomeOwnerId() != null){
+            userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Encargado"));
+            userService.deleteRoleToUser(home.getHomeOwnerId(), roleService.getRoleByName("Residente"));
+        }
 
         for(User member : home.getHomeMemberId()){
             userService.deleteRoleToUser(member, roleService.getRoleByName("Residente"));
