@@ -165,6 +165,15 @@ public class GuardController {
                     HttpStatus.NOT_FOUND
             );
         }
+        // validar si el permiso aun es valido
+        if(!permission.isValid()){
+            return new ResponseEntity<>(
+                    new GeneralResponse.Builder()
+                            .message("Permission is no longer valid")
+                            .build(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
 
         // validar que el permiso este aprobado
         if (permission.getStatus() == null) {
